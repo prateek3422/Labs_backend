@@ -1,6 +1,7 @@
 import { AppErrorRequestHandler, AppNextFunction, AppRequest, AppResponse } from "@/types"
 import { HttpError } from "./httpError"
 import { myEnvironment } from "@/configs"
+import { ZodError } from "zod"
 
 //Type for async handler
 type AsyncHandler = (request: AppRequest, response: AppResponse, next: AppNextFunction) => Promise<unknown>
@@ -34,11 +35,18 @@ export const globalErrorHandler: AppErrorRequestHandler = (
         message = error.message || "Internal Server Error"
     }
 
+    // zod error
+    if (error instanceof ZodError) {
+        statusCode = 403
+        message = error.issues[0].message
+    }
+
     // json token error
     if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
         statusCode = 401
         message = `Unauthorized | ${error.name === "TokenExpiredError" ? "Token expired" : "Invalid token"}`
     }
+    
 
     const responseBody = {
         statusCode,

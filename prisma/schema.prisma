@@ -27,6 +27,9 @@ model Users {
   image String?
   role UserRole @default(USER)
   password String
+  refreshToken String @default("")
+  otp String @default("")
+  isVerified Boolean 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

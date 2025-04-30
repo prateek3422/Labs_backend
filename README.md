@@ -1,11 +1,10 @@
-# Nt-User-Service
-
+# algo
 # Docker
 
 ## build project docker image
 
 ```sh
- docker build -t nt-user-service .
+ docker build -t algo.
 ```
 
 ## Run database

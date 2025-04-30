@@ -15,9 +15,16 @@ export type IcreateUser = {
     password : string
 }
 
+export type IUpateUser = {
+    email: string
+    token?: string
+    otp?: string
+    isVerified?:boolean
+}
 
 export interface IUserRepo {
     getUsers(): Promise<[] | TUser[]>
-
     createUser(data: IcreateUser): Promise<null | TUser>
+    updateUser(data: IUpateUser ): Promise<null | IUpateUser>
+    
 }
