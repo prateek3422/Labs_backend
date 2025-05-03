@@ -10,13 +10,15 @@ class UserService {
     createUserService = async (data: IcreateUser) => {
         //* check if user exist or not
         const user = await userRepo.getUsers()
+        // eslint-disable-next-line no-console
+        console.log(user)
 
         if (user) {
             return {
                 statusCode: 400,
                 error: "Email already exist",
                 data: {
-                    user
+                    user: null
                 }
             }
         }
@@ -25,12 +27,21 @@ class UserService {
 
         const hashedPassword = hashUtilities.createHash(data.password)
 
+        // generate token
+        const token = tokenUtilities.sign({ email: data.email }, myEnvironment.TOKEN, myEnvironment.TOKEN_EXPAIRY)
+
+        // generate Otp
+
+        const otpString = String(generateOtp(6))
+
         // save user in database
 
         const newUser = await userRepo.createUser({
             name: data.name,
             email: data.email,
-            password: hashedPassword
+            password: hashedPassword,
+            otp: otpString,
+            refreshToken: token
         })
 
         if (!newUser) {
@@ -40,19 +51,6 @@ class UserService {
                 data: null
             }
         }
-
-        // generate token
-        const token = tokenUtilities.sign({ email: data.email }, myEnvironment.TOKEN, myEnvironment.TOKEN_EXPAIRY)
-
-        // generate Otp
-
-        const otpString = String(generateOtp(6))
-
-        await userRepo.updateUser({
-            email: data.email,
-            otp: otpString,
-            token: token
-        })
 
         // send email to verify
         await sendEmail({
@@ -67,6 +65,7 @@ class UserService {
         return {
             statusCode: 201,
             message: "User created successfully",
+            token: token,
             data: {
                 user: null
             }

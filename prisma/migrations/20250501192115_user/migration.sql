@@ -9,6 +9,9 @@ CREATE TABLE "Users" (
     "image" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "password" TEXT NOT NULL,
+    "refreshToken" TEXT NOT NULL DEFAULT '',
+    "otp" TEXT NOT NULL DEFAULT '',
+    "isVerified" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

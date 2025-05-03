@@ -14,11 +14,18 @@ class UserController {
         const result = await userService.createUserService(data)
 
         if (result.statusCode === 201) {
-            response.status(result.statusCode).json({
-                statusCode: result.statusCode,
-                mesaage: result.message,
-                data: result.data
-            })
+            response
+                .cookie("token", result.token, {
+                    httpOnly: true,
+                    sameSite: "none",
+                    secure: true
+                })
+                .status(result.statusCode)
+                .json({
+                    statusCode: result.statusCode,
+                    mesaage: result.message,
+                    data: result.data
+                })
         } else {
             return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
         }
