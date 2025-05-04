@@ -9,6 +9,7 @@ class Token {
     // verify token
     verify = (token: string, secret: string) => {
         return jwt.verify(token, secret)
+
     }
 }
 export const tokenUtilities = new Token()

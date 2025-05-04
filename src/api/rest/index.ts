@@ -30,6 +30,7 @@ app.get("/", (_request: AppRequest, response: AppResponse) => {
 
 app.use("/api/v1/users", userRouter)
 
+
 // 404
 app.use(notFoundHandler)
 

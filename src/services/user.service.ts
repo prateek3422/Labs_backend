@@ -9,9 +9,7 @@ import { tokenUtilities } from "@/utils/tokenUtile"
 class UserService {
     createUserService = async (data: IcreateUser) => {
         //* check if user exist or not
-        const user = await userRepo.getUsers()
-        // eslint-disable-next-line no-console
-        console.log(user)
+        const user = await userRepo.getUser()
 
         if (user) {
             return {
@@ -71,6 +69,110 @@ class UserService {
             }
         }
     }
+
+    verifyUserService = async ({ otp, email }: { otp: string; email: string }) => {
+        const user = await userRepo.getSingleUser({ email })
+
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "User not exist",
+                data: {
+                    user: null
+                }
+            }
+        }
+
+        if (user.otp !== otp) {
+            return {
+                statusCode: 400,
+                error: "Invalid otp",
+                data: {
+                    user: null
+                }
+            }
+        }
+
+        const userVerify = await userRepo.verifyUser({
+            email: user?.email,
+            otp: "",
+            isVerified: true,
+            refreshToken: ""
+        })
+
+        if (!userVerify) {
+            return {
+                statusCode: 400,
+                error: "user verification error",
+                data: {
+                    user: null
+                }
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "user verified successfully",
+            data: null
+        }
+    }
+
+    resendEmailService = async (email: string) => {
+        const user = await userRepo.getSingleUser({ email })
+
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "User not exist",
+                data: {
+                    user: null
+                }
+            }
+        }
+
+        // generate otp
+
+        const newOtp = String(generateOtp(6))
+
+        // token generator
+
+        const token = tokenUtilities.sign({ email: email }, myEnvironment.TOKEN, myEnvironment.TOKEN_EXPAIRY)
+
+        const updateOtp = await userRepo.verifyUser({
+            otp: newOtp,
+            refreshToken: token
+        })
+
+        if (!updateOtp) {
+            return {
+                statusCode: 400,
+                error: "email resend error",
+                data: {
+                    user: null
+                }
+            }
+        }
+        // send email to verify
+        await sendEmail({
+            email: user.email,
+            subjects: "Email verify",
+            mailgentemp: emailverify({
+                name: user.name,
+                otp: newOtp
+            })
+        })
+
+        return {
+            statusCode: 201,
+            message: "email successfully send",
+            token: token,
+            data: {
+                user: null
+            }
+        }
+    }
+
+    
 }
 
 export const userService = new UserService()

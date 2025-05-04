@@ -4,7 +4,7 @@ import { myEnvironment } from "@/configs"
 import Mailgen from "mailgen"
 import { Resend } from "resend"
 
-const resend = new Resend("re_123456789")
+const resend = new Resend(myEnvironment.RESEND)
 
 const sendEmail = async ({ email, subjects, mailgentemp }: { email: string; subjects: string; mailgentemp: Mailgen.Content }) => {
     const mailGenerator = new Mailgen({
@@ -14,30 +14,20 @@ const sendEmail = async ({ email, subjects, mailgentemp }: { email: string; subj
             link: "https://mailgen.js/"
         }
     })
-
+    
     const emailBody = mailGenerator.generate(mailgentemp)
-
+    
     const emailText = mailGenerator.generatePlaintext(mailgentemp)
 
-    const { data, error } = await resend.emails.send({
-        from: myEnvironment.EMAIL || "info@prateekdev.me",
+   await resend.emails.send({
+        from: myEnvironment.EMAIL || "ps0431299@gmail.com",
         to: email,
         subject: subjects,
         text: emailText,
         html: emailBody
     })
-
-    if (error) {
-        return {
-            statuscode: 200,
-            message: error
-        }
-    }
-    return {
-        statusCode: 200,
-        message: "email send success",
-        data
-    }
+    
+   
 }
 
 

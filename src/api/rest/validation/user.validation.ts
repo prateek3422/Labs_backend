@@ -10,6 +10,16 @@ const createUserValidation  =  z.object({
     
 })
 
+const ermailVerifyValidation  = z.object({
+    otp: z.string({required_error: "Otp required "}).max(6)
+})
+
+const getEmail = z.object({
+    email: z.string({required_error: "email is required"}).email()
+})
+
 export {
-    createUserValidation
+    createUserValidation,
+    ermailVerifyValidation,
+    getEmail
 }
