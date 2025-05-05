@@ -45,4 +45,17 @@ const emailverify =  ({ name, otp }: { name: string; otp: string }) => {
     }
 }
 
-export { sendEmail, emailverify }
+const forgotPassword =  ({ name, otp }: { name: string; otp: string }) => {
+    return {
+        body: {
+            name: name,
+            intro: "Welcome to our app! We're very excited to have you on board.",
+            dictionary: {
+                otp: otp
+            },
+            outro: "Need help, or have questions? Just reply to this email, we'd love to help."
+        }
+    }
+}
+
+export { sendEmail, emailverify, forgotPassword }

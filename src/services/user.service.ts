@@ -1,5 +1,5 @@
 import { myEnvironment } from "@/configs"
-import { emailverify, sendEmail } from "@/mails"
+import { emailverify, forgotPassword, sendEmail } from "@/mails"
 import { userRepo } from "@/repositories"
 import { IcreateUser } from "@/types/repositories"
 import { generateOtp } from "@/utils"
@@ -229,12 +229,12 @@ class UserService {
             statusCode: 200,
             message: "User logged in successfully",
             data: {
-                user:{
+                user: {
                     id: user.id,
                     name: user.name,
                     email: user.email,
                     role: user.role,
-                    verified : user.isVerified
+                    verified: user.isVerified
                 },
                 AccessToken,
                 RefreshToken
@@ -242,31 +242,220 @@ class UserService {
         }
     }
 
-    logoutUSerService = async (email: string) => {
-        const user = await userRepo.getSingleUser({email})
+    logoutUSerService = async (id: string) => {
+        const user = await userRepo.getSingleUser({ id })
 
-        if(!user){
+        if (!user) {
             return {
                 statusCode: 400,
                 error: "user not found",
-                data:null
+                data: null
             }
         }
 
         await userRepo.verifyUser({
-            refreshToken :""
+            refreshToken: ""
         })
 
-        
         return {
-            statusCode : 200,
-            message : "user logout successfull",
-            data: null 
+            statusCode: 200,
+            message: "user logout successfull",
+            data: null
         }
-     
     }
 
-    
+    getUserService = async (id: string) => {
+        const user = await userRepo.getSingleUser({ id })
+
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "user found successfully",
+            data: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                verified: user.isVerified,
+                image: user.image,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }
+        }
+    }
+
+    getAllUserService = async () => {
+        const users = await userRepo.getUsers()
+
+        if (!users) {
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "user found successfully",
+            data: users.map((user) => ({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                verified: user.isVerified,
+                image: user.image,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }))
+        }
+    }
+
+
+    refreshTokenService = async (token: string) => {
+        const user = await userRepo.getSingleUser({ refreshToken: token })
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data: null
+            }
+        }
+
+        const decoded = tokenUtilities.verify(token, myEnvironment.REFRESH_TOKEN as string)
+
+        if (!decoded) {
+            return {
+                statusCode: 400,
+                error: "Invalid token",
+                data: null
+            }
+        }
+
+        const newAccessToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            myEnvironment.ACCESS_TOKEN as string,
+            myEnvironment.ACCESS_TOKEN_EXPAIRY as string
+        )
+
+        const newRefreshToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            myEnvironment.REFRESH_TOKEN as string,
+            myEnvironment.REFRESH_TOKEN_EXPAIRY as string
+        )
+
+        await userRepo.verifyUser({
+            email: user.email,
+            refreshToken: newRefreshToken
+        })
+
+        return {
+            statusCode: 200,
+            message: "Token refreshed successfully",
+            data: {
+                AccessToken: newAccessToken,
+                RefreshToken: newRefreshToken
+            }
+        }
+    }
+
+    forgotPasswordService = async (email: string) => {
+        const user = await userRepo.getSingleUser({ email })
+
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data: null
+            }
+        }
+
+        // generate otp
+        const newOtp = String(generateOtp(6))
+
+        // token generator
+
+        const token = tokenUtilities.sign({ email: email }, myEnvironment.TOKEN, myEnvironment.TOKEN_EXPAIRY)
+
+        // update user with new otp and token
+        const updateOtp = await userRepo.verifyUser({
+            otp: newOtp,
+            refreshToken: token
+        })
+
+        if (!updateOtp) {
+            return {
+                statusCode: 400,
+                error: "email resend error",
+                data: null
+            }
+        }
+
+        // send email to verify
+        await sendEmail({
+            email: user.email,
+            subjects: "Forgot password",
+            mailgentemp: forgotPassword({
+                name: user.name,
+                otp: newOtp
+            })
+        })
+
+        return {
+            statusCode: 201,
+            message: "email successfully send",
+            data: token
+        }
+    }
+
+    resetPasswordService = async (data: { email: string; password: string }) => {
+        const user = await userRepo.getSingleUser({ email: data.email })
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data: null
+            }
+        }
+
+        const hashedPassword = hashUtilities.createHash(data.password)
+
+        const updatePassword = await userRepo.updateUserPassword({
+            email: user.email,
+            password: hashedPassword,
+            otp: "",
+            refreshToken: ""
+        })
+
+        if (!updatePassword) {
+            return {
+                statusCode: 400,
+                error: "password update error",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "password updated successfully",
+            data: null
+        }
+    }
 }
 
 export const userService = new UserService()

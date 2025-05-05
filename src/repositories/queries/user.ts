@@ -1,4 +1,4 @@
-import { IcreateUser, ISingleUser, IUpateUser, IUserRepo, IVerifyUser, TUser } from "@/types/repositories"
+import { IcreateUser, ISingleUser, IUpateUserPassword, IUserRepo, IVerifyUser, TUser } from "@/types/repositories"
 import { prisma } from "../database"
 import { asyncHandler } from "@/configs/handler"
 
@@ -13,7 +13,7 @@ class UserRepo implements IUserRepo {
     }
 
     async getSingleUser(data: ISingleUser) {
-        const { data: signleUser, error } = await asyncHandler(prisma.users.findUnique({ where: { email: data.email } }))
+        const { data: signleUser, error } = await asyncHandler(prisma.users.findFirst({ where: { OR: [{ email: data?.email }, { id: data?.id }, {refreshToken: data?.refreshToken}] } }))
 
         if (error) {
             return null
@@ -38,11 +38,15 @@ class UserRepo implements IUserRepo {
         return allUsers as TUser[]
     }
 
-    async updateUser(data: IUpateUser) {
-        const { data: updateuser, error } = await asyncHandler(
+    async updateUserPassword(data: IUpateUserPassword) {
+        const { data: updateuserPass, error } = await asyncHandler(
             prisma.users.update({
                 where: { email: data?.email },
-                data
+                data :{
+                    password: data?.password,
+                    otp: data?.otp,
+                    refreshToken: data?.refreshToken
+                }
             })
         )
 
@@ -50,7 +54,7 @@ class UserRepo implements IUserRepo {
             return null
         }
 
-        return updateuser
+        return updateuserPass as TUser
     }
     async verifyUser(data: IVerifyUser): Promise<IVerifyUser | null> {
         const { data: verify, error } = await asyncHandler(

@@ -28,21 +28,24 @@ export type IVerifyUser = {
     refreshToken?: string
 }
 
-export type IUpateUser = {
+export type IUpateUserPassword = {
     email: string
-    token?: string
-    isVerified?: boolean
+    password: string
+    otp: string
+    refreshToken?: string
 }
 
 export type ISingleUser = {
-    email?: string,
+    email?: string
+    id?: string
+    refreshToken?: string
 }
 
 export interface IUserRepo {
     getUser(): Promise<null | TUser>
-    getSingleUser(data:ISingleUser): Promise<null | TUser>
+    getSingleUser(data: ISingleUser): Promise<null | TUser>
     getUsers(): Promise<[] | TUser[]>
     createUser(data: IcreateUser): Promise<null | TUser>
     verifyUser(data: IcreateUser): Promise<null | IVerifyUser>
-    updateUser(data: IUpateUser): Promise<null | IUpateUser>
+    updateUserPassword(data: IUpateUserPassword): Promise<null | TUser>
 }
