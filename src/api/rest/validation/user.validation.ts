@@ -1,3 +1,4 @@
+import e from "express";
 import { z } from "zod";
 
 
@@ -18,8 +19,14 @@ const getEmail = z.object({
     email: z.string({required_error: "email is required"}).email()
 })
 
+const loginUserValidation = z.object({
+    email: z.string({required_error: "email is required"}).email(),
+    password: z.string({required_error: "password is required"}).min(6)
+
+})
 export {
     createUserValidation,
     ermailVerifyValidation,
-    getEmail
+    getEmail,
+    loginUserValidation
 }

@@ -1,5 +1,5 @@
 import { AppNextFunction, AppRequest, AppResponse } from "@/types"
-import { createUserValidation, ermailVerifyValidation, getEmail } from "../validation"
+import { createUserValidation, ermailVerifyValidation, getEmail, loginUserValidation } from "../validation"
 import { HttpError } from "../configs"
 import { userService } from "@/services/user.service"
 
@@ -83,8 +83,37 @@ class UserController {
     }
 
     loginUser = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        
+        const { data, error } = loginUserValidation.safeParse(request.body)
 
+        if (error) {
+            return next(new HttpError(error?.issues[0]?.message, 400))
+        }
+        const result = await userService.loginUserService({
+            email: data.email,
+            password: data.password
+        })
+
+        if (result.statusCode === 200) {
+            response
+                .status(result.statusCode)
+                .cookie("AccessToken", result?.data?.AccessToken, {
+                    httpOnly: true,
+                    sameSite: "none",
+                    secure: true
+                })
+                .cookie("RefreshToken", result?.data?.RefreshToken, {
+                    httpOnly: true,
+                    sameSite: "none",
+                    secure: true
+                })
+                .json({
+                    statusCode: result.statusCode,
+                    message: result.message,
+                    data: result.data
+                })
+        }else{
+             return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+        }
     }
 }
 

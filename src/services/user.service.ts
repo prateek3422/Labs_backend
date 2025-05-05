@@ -172,7 +172,75 @@ class UserService {
         }
     }
 
-    
+    loginUserService = async ({ email, password }: { email: string; password: string }) => {
+        const user = await userRepo.getSingleUser({ email })
+
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "Invalid credentials",
+                data: null
+            }
+        }
+
+        if (!user.isVerified) {
+            return {
+                statusCode: 400,
+                error: "user not verified",
+                data: null
+            }
+        }
+        const compairPassword = hashUtilities.compareHash(password, user.password)
+
+        if (!compairPassword) {
+            return {
+                statusCode: 400,
+                error: "Invalid credentials",
+                data: null
+            }
+        }
+
+        const AccessToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            myEnvironment.ACCESS_TOKEN as string,
+            myEnvironment.ACCESS_TOKEN_EXPAIRY as string
+        )
+
+        const RefreshToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            myEnvironment.REFRESH_TOKEN as string,
+            myEnvironment.REFRESH_TOKEN_EXPAIRY as string
+        )
+
+        await userRepo.verifyUser({
+            email: user.email,
+            refreshToken: RefreshToken
+        })
+
+        return {
+            statusCode: 200,
+            message: "User logged in successfully",
+            data: {
+                user:{
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    verified : user.isVerified
+                },
+                AccessToken,
+                RefreshToken
+            }
+        }
+    }
 }
 
 export const userService = new UserService()
