@@ -35,7 +35,7 @@ export type IUpateUser = {
 }
 
 export type ISingleUser = {
-    email : string
+    email?: string,
 }
 
 export interface IUserRepo {

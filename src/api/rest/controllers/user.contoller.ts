@@ -111,8 +111,28 @@ class UserController {
                     message: result.message,
                     data: result.data
                 })
+        } else {
+            return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+        }
+    }
+
+    logOutUser = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const email = request.user?.email
+
+        if (!email) {
+            return next(new HttpError("Email is required for logout", 400))
+        }
+
+        const result = await userService.logoutUSerService(email)
+
+        if(result.statusCode === 200){
+            response.status(result.statusCode).clearCookie("AccessToken").clearCookie("RefreshToken").json({
+                statusCode: result.statusCode,
+                message: result.message,
+                data: result.data
+            })
         }else{
-             return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+         return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
         }
     }
 }

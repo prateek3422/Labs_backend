@@ -241,6 +241,32 @@ class UserService {
             }
         }
     }
+
+    logoutUSerService = async (email: string) => {
+        const user = await userRepo.getSingleUser({email})
+
+        if(!user){
+            return {
+                statusCode: 400,
+                error: "user not found",
+                data:null
+            }
+        }
+
+        await userRepo.verifyUser({
+            refreshToken :""
+        })
+
+        
+        return {
+            statusCode : 200,
+            message : "user logout successfull",
+            data: null 
+        }
+     
+    }
+
+    
 }
 
 export const userService = new UserService()
