@@ -15,7 +15,6 @@ router.get("/getalluser", authMiddleware, AsyncErrorHandler(userController.getAl
 router.patch("/updateuser", authMiddleware, AsyncErrorHandler(userController.refreshToken))
 router.patch("/forgotpassword", AsyncErrorHandler(userController.forgotPassword))
 router.patch("/resetpassword", AsyncErrorHandler(userController.resetPassword)
-
 )
 
 export { router as userRouter }

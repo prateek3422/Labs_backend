@@ -20,6 +20,12 @@ enum UserRole {
   USER
 }
 
+enum ProblemDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model Users {
   id   String @id @default(uuid()) @db.Uuid
   name String @db.VarChar(191)
@@ -32,4 +38,30 @@ model Users {
   isVerified Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  problems Problem[]
+}
+
+
+model  Problem{
+  id String @id @default(uuid()) @db.Uuid
+  title String @db.VarChar(191)
+  description String
+  tags String[]
+  difficulty ProblemDifficulty @default(EASY)
+  userId String
+  example Json
+  constraints String
+  hints String?
+  editorial String
+
+  tetsCases Json
+  codeSnippet Json
+  refenceSolutions Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //RELATIONSHIPS
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
