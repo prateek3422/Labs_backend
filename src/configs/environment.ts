@@ -11,7 +11,8 @@ const _environment = {
     REFRESH_TOKEN: process.env.REFRESH_TOKEN || "askljkjsakldjjmkjqojiosaks",
     REFRESH_TOKEN_EXPAIRY: process.env.REFRESH_TOKEN_EXPAIRY || "10D",
     ACCESS_TOKEN: process.env.ACCESS_TOKEN || "kasajkahsahsjahjsab",
-    ACCESS_TOKEN_EXPAIRY: process.env.ACCESS_TOKEN_EXPAIRY || "60m"
+    ACCESS_TOKEN_EXPAIRY: process.env.ACCESS_TOKEN_EXPAIRY || "60m",
+    JUDGE0_API: process.env.JUDGE_API_URL || "http://localhost:2358"
 }
 
 export const myEnvironment = Object.freeze(_environment)

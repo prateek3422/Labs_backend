@@ -175,13 +175,15 @@ class UserController {
 
 
     refreshToken = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const token  = request.cookies.RefreshToken
+        const token  = request.cookies as {
+            RefreshToken: string
+        }
 
         if(!token){
             return next(new HttpError("Refresh token is required", 400))
         }
 
-        const result = await userService.refreshTokenService(token)
+        const result = await userService.refreshTokenService(token.RefreshToken)
 
         if (result.statusCode === 200) {
             response

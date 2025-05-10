@@ -4,7 +4,7 @@ import path from "node:path"
 import { globalErrorHandler, notFoundHandler } from "./configs"
 import cors, { CorsOptions } from "cors"
 import cookieParser from "cookie-parser"
-import { userRouter } from "./routes"
+import { problemRouter, userRouter } from "./routes"
 
 const app = express()
 
@@ -29,6 +29,7 @@ app.get("/", (_request: AppRequest, response: AppResponse) => {
 //routes
 
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/problems", problemRouter )
 
 
 // 404
