@@ -14,7 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum UserRole {
   ADMIN
   USER
@@ -27,40 +26,142 @@ enum ProblemDifficulty {
 }
 
 model Users {
-  id   String @id @default(uuid()) @db.Uuid
-  name String @db.VarChar(191)
-  email String @unique
-  image String?
-  role UserRole @default(USER)
-  password String
-  refreshToken String @default("")
-  otp String @default("")
-  isVerified Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  problems Problems[]
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String          @db.VarChar(191)
+  email        String          @unique
+  image        String?
+  role         UserRole        @default(USER)
+  password     String
+  refreshToken String          @default("")
+  otp          String          @default("")
+  isVerified   Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  problems     Problems[]
+  submissions  Submissions[]
+  solvedBy     ProblemSolved[]
+  playlist     Playlist[]
 }
 
-
-model  Problems {
-  id String @id @default(uuid()) @db.Uuid
-  title String @db.VarChar(191)
+model Problems {
+  id          String            @id @default(uuid()) @db.Uuid
+  title       String            @db.VarChar(191)
   description String
-  tags String[]
-  difficulty ProblemDifficulty @default(EASY)
-  userId String @db.Uuid
-  example Json
+  tags        String[]
+  difficulty  ProblemDifficulty @default(EASY)
+  userId      String            @db.Uuid
+  example     Json
   constraints String
-  hints String?
-  editorial String
+  hints       String?
+  editorial   String?
 
-  tetsCases Json
-  codeSnippet Json
-  refenceSolutions Json
+  testCases          Json
+  codeSnippet        Json
+  referenceSolutions Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   //RELATIONSHIPS
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions      Submissions[]
+  solvedProblems   ProblemSolved[]
+  problemPlaylists problemInPlaylist[]
 }
+
+model Submissions {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  problemId     String   @db.Uuid
+  sourceCode    Json
+  language      String
+  stdin         String?
+  stdout        String?
+  stderr        String?
+  compileOutput String?
+  status        String
+  memory        String?
+  time          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  //RELATIONSHIPS
+  user      Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problems    @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  testCases TestCases[]
+}
+
+model TestCases {
+  id             String   @id @default(uuid()) @db.Uuid
+  submissionId   String   @db.Uuid
+  testCase       Int
+  passed         Boolean
+  stdout         String?
+  expectedOutput String?
+  stderr         String?
+  status         String
+  memory         String?
+  time           String?
+  compileOutput  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  //RELATIONSHIPS
+  submission Submissions @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model ProblemSolved {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  problemId String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //RELATIONSHIPS
+  user    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
+model Playlist {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  userId      String              @db.Uuid
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  problems    problemInPlaylist[]
+  user        Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, userId])
+}
+
+model problemInPlaylist {
+  id         String   @id @default(uuid()) @db.Uuid
+  problemId  String   @db.Uuid
+  playlistId String   @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  //RELATIONSHIPS
+  problem  Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@unique([problemId, playlistId])
+}
+
+// model UserActivity {
+//   id        String   @id @default(uuid()) @db.Uuid
+//   userId    String   @db.Uuid
+//   problemId String   @db.Uuid
+//   activity  String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   //RELATIONSHIPS
+//   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+

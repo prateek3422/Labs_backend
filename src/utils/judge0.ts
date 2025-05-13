@@ -3,54 +3,77 @@ import axios from "axios";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const getJudge0Languages = (language: string) => {
-    const languageMap: Record<string, number> = {
-        "PYTHON": 71,
-        "C": 50,
-        "C++": 54,
-        "JAVA": 62,
-        "JAVASCRIPT": 63,
-        "TYPESCRIPT": 73,
-        "GO": 72,
-        "RUBY": 70,
-    };
-    return languageMap[language.toUpperCase()] || undefined;
+export interface JudgeSubmission {
+  source_code: string;
+  language_id: number;
+  stdin: string;
+  expected_output: string;
 }
 
-
-
-
-export const submitBatch = async (submissions: string[]) => {
-    const { data } = await axios.post(`${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`, {
-        submissions
-    }
-    )
-
-
-    return data;
-
+export interface SubmissionResponse {
+  token: string;
 }
 
+export interface BatchSubmissionResponse {
+  submissions: SubmissionResponse[];
+}
 
-export const pollBatchResults = async (tokens: string[]) => {
-    while (true) {
-        const { data } = await axios.get(`${myEnvironment.JUDGE0_API}/submissions/batch`, {
-            params: {
-                tokens: tokens.join(","),
-                base64_encoded: false,
-            }
-        })
+export interface JudgeResult {
+  status: {
+    id: number;
+    description?: string;
+  };
+  stdout?: string;
+  stderr?: string;
+  compile_output?: string;
+  message?: string;
+  time?: string;
+  memory?: string;
+}
 
+export interface BatchResultResponse {
+  submissions: JudgeResult[];
+}
 
+export const getJudge0Languages = (language: string): number | undefined => {
+  const languageMap: Record<string, number> = {
+    "PYTHON": 71,
+    "C": 50,
+    "C++": 54,
+    "JAVA": 62,
+    "JAVASCRIPT": 63,
+    "TYPESCRIPT": 73,
+    "GO": 72,
+    "RUBY": 70,
+  };
+  return languageMap[language.toUpperCase()];
+}
 
-        const result = data.submissions;
-        const isAllDone = result.every((r: { status: { id: number } }) => r.status.id !== 1 && r.status.id !== 2);
+export const submitBatch = async (submissions: JudgeSubmission[]): Promise<SubmissionResponse[]> => {
+  const { data } = await axios.post<BatchSubmissionResponse>(
+    `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`, 
+    { submissions }
+  );
+  return data.submissions;
+}
 
-        if (isAllDone) return result;
+export const pollBatchResults = async (tokens: string[]): Promise<JudgeResult[]> => {
+  while (true) {
+    const { data } = await axios.get<BatchResultResponse>(
+      `${myEnvironment.JUDGE0_API}/submissions/batch`, 
+      {
+        params: {
+          tokens: tokens.join(","),
+          base64_encoded: false,
+        }
+      }
+    );
 
-        await sleep(1000);
+    const result = data.submissions;
+    const isAllDone = result.every((r) => r.status.id !== 1 && r.status.id !== 2);
 
-    }
+    if (isAllDone) return result;
 
-
+    await sleep(1000);
+  }
 }

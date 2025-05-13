@@ -14,7 +14,9 @@
         "prepare": "husky",
         "db:gen": "pnpm dlx prisma generate",
         "db:mig": "pnpm dlx prisma migrate dev",
-        "db:st": "pnpm dlx prisma studio"
+        "db:st": "pnpm dlx prisma studio",
+        "db:reset": "pnpm dlx prisma migrate reset",
+        "db:push": "pnpm dlx prisma db push"
     },
     "lint-staged": {
         "*.ts": [
