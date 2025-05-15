@@ -26,6 +26,7 @@
 
 
 export type TProblem = {
+    id: string;
     title: string;
     description: string;
     tags: string[];
@@ -37,7 +38,7 @@ export type TProblem = {
     }[];
     userId: string;
     constraints: string;
-    hints?: string[];
+    hints?: string;
     editorial?: string;
     testCases: {
         input: string;
@@ -76,4 +77,6 @@ export interface IProblemRepo {
     createProblem(data: TProblemCreate): Promise<null | TProblem>
     getProblems(): Promise<null | TProblem[]>
     getProblemById(data: TProblemId): Promise<null | TProblem>
+    updateProblem(data: TProblem): Promise<null | TProblem>
+    deleteProblem(data: TProblemId, id : TProblemId): Promise<null | TProblem>
 }

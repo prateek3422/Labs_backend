@@ -49,7 +49,7 @@ const createProblemValidation = z.object({
 
     referenceSolutions: z.record(z.string()),
 
-    hints: z.array(z.string()).optional(),
+    hints: z.string().optional(),
 
     editorial: z.any().optional(), // You might want to define a more specific schema for editorial
 });

@@ -39,7 +39,7 @@ model Users {
   updatedAt    DateTime        @updatedAt
   problems     Problems[]
   submissions  Submissions[]
-  solvedBy     ProblemSolved[]
+  solvedProblems     ProblemSolved[]
   playlist     Playlist[]
 }
 
@@ -65,7 +65,7 @@ model Problems {
   //RELATIONSHIPS
   user             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
   submissions      Submissions[]
-  solvedProblems   ProblemSolved[]
+  solvedBy   ProblemSolved[]
   problemPlaylists problemInPlaylist[]
 }
 

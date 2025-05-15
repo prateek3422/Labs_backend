@@ -27,6 +27,42 @@ class ProblemRepo implements IProblemRepo{
 
         return problem as unknown as TProblem
     }
+
+    async deleteProblem(data: TProblemId) {
+        const {data: deleteProblem, error} = await asyncHandler(prisma.problems.delete({where: {id: data.id}}))
+
+        if(error){
+            return null
+        }
+
+        return deleteProblem as unknown as TProblem
+        
+    }
+
+    async updateProblem(data: TProblem) {
+        const { data: updateProblem, error } = await asyncHandler(prisma.problems.update({
+            where: { id: data.id },
+            data: {
+                title: data.title,
+                description: data.description,
+                tags: data.tags,
+                difficulty: data.difficulty,
+                example: data.example,
+                constraints: data.constraints,
+                hints: data.hints,
+                editorial: data.editorial,
+                testCases: data.testCases,
+                codeSnippet: data.codeSnippet,
+                referenceSolutions: data.referenceSolutions
+            }
+        }));
+
+        if (error) {
+            return null;
+        }
+
+        return updateProblem as unknown as TProblem;
+    }
 }
 
 

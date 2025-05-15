@@ -4,10 +4,11 @@ import axios from "axios";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface JudgeSubmission {
-  source_code: string;
+
+  source_code: string | Record<string, string>; 
   language_id: number;
   stdin: string;
-  expected_output: string;
+  expected_output?: string;
 }
 
 export interface SubmissionResponse {
@@ -49,18 +50,34 @@ export const getJudge0Languages = (language: string): number | undefined => {
   return languageMap[language.toUpperCase()];
 }
 
-export const submitBatch = async (submissions: JudgeSubmission[]): Promise<SubmissionResponse[]> => {
-  const { data } = await axios.post<BatchSubmissionResponse>(
-    `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`, 
+export const getLanguage = (language_id : number) => {
+  const languageMap: Record<number, string> = {
+    71: "PYTHON",
+    50: "C",
+    54: "C++",
+    62: "JAVA",
+    63: "JAVASCRIPT",
+    73: "TYPESCRIPT",
+    72: "GO",
+    70: "RUBY",
+  };
+  return languageMap[language_id] || "UNKNOWN";
+}
+
+export const submitBatch = async (submissions: JudgeSubmission[]) => {
+  const response = await axios.post<BatchSubmissionResponse>(
+    `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`,
     { submissions }
   );
-  return data.submissions;
+
+  return response.data;
+
 }
 
 export const pollBatchResults = async (tokens: string[]): Promise<JudgeResult[]> => {
   while (true) {
-    const { data } = await axios.get<BatchResultResponse>(
-      `${myEnvironment.JUDGE0_API}/submissions/batch`, 
+    const response = await axios.get<BatchResultResponse>(
+      `${myEnvironment.JUDGE0_API}/submissions/batch`,
       {
         params: {
           tokens: tokens.join(","),
@@ -69,10 +86,10 @@ export const pollBatchResults = async (tokens: string[]): Promise<JudgeResult[]>
       }
     );
 
-    const result = data.submissions;
-    const isAllDone = result.every((r) => r.status.id !== 1 && r.status.id !== 2);
+    const results: JudgeResult[] = response.data.submissions;
+    const isAllDone = results.every((r) => r.status.id !== 1 && r.status.id !== 2);
 
-    if (isAllDone) return result;
+    if (isAllDone) return results;
 
     await sleep(1000);
   }
