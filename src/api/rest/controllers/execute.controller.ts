@@ -27,6 +27,8 @@ class ExecuteController {
                 message: result.message,
                 data: result.data
             })
+        }else {
+            return next(new HttpError(result.error || "something went wrong", result.statusCode))
         }
     }
 

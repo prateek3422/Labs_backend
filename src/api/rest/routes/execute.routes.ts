@@ -6,7 +6,7 @@ import { executeController } from "../controllers";
 
 const route = Router() 
 
-route.post("/createSubmission", authMiddleware, AsyncErrorHandler(executeController.executeCode) )
+route.post("/execute", authMiddleware, AsyncErrorHandler(executeController.executeCode) )
 
 
 export { route as executeRouter }

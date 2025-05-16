@@ -1,3 +1,4 @@
 export * from "./user.routes"
 export * from "./problem.routes"
 export * from "./execute.routes"
+export * from "./submission.routes"

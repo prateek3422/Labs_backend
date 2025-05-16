@@ -42,9 +42,18 @@ export type TTestCases = {
     time?: string
 }
 
+export type TUserId = {
+    userId: string
+    problemId?: string
+}
+
+
 
 export interface IExportRepo {
     submission(data: TSubmission): Promise<null | TSubmission>
     solvedProblem(data: TSolvedProblem): Promise<null | TSolvedProblem>
-    testCases(data: TTestCases): Promise<null | TTestCases>
+    testCases(data: TTestCases[]): Promise<null | TTestCases[]>
+    getAllSubmissions(data: TUserId): Promise<null | TSubmission[]>
+    getSubmissionByProblemId(data: TUserId): Promise<null | TSubmission[]>
+    getSubmissionCount(problemId: string): Promise<null | number>
 }

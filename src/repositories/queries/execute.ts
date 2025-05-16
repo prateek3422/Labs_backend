@@ -1,20 +1,20 @@
 import { asyncHandler } from "@/configs/handler";
 ;
 import { prisma } from "../database";
-import { IExportRepo, TSolvedProblem, TSubmission, TTestCases } from "@/types/repositories";
+import { IExportRepo, TSolvedProblem, TSubmission, TTestCases, TUserId } from "@/types/repositories";
 
 class ExecuteRepo implements IExportRepo {
     async submission(data: TSubmission) {
-        const {data: executeCode, error} = await asyncHandler(prisma.submissions.create({data}))
+        const { data: executeCode, error } = await asyncHandler(prisma.submissions.create({ data }))
         if (error) {
             return null
         }
-        return executeCode as unknown as TSubmission   
+        return executeCode as unknown as TSubmission
     }
 
-    async solvedProblem (data: TSolvedProblem) {
-        const {data: solvedProblem, error} = await asyncHandler(prisma.problemSolved.upsert({
-            where:{
+    async solvedProblem(data: TSolvedProblem) {
+        const { data: solvedProblem, error } = await asyncHandler(prisma.problemSolved.upsert({
+            where: {
                 userId_problemId: {
                     userId: data.userId,
                     problemId: data.problemId
@@ -28,7 +28,7 @@ class ExecuteRepo implements IExportRepo {
             }
         }))
 
-        if(error) {
+        if (error) {
             return null
         }
 
@@ -36,15 +36,60 @@ class ExecuteRepo implements IExportRepo {
 
     }
 
-    async testCases(data: TTestCases) {
-        const {data: testCase, error} = await asyncHandler(prisma.testCases.createMany({data}))
+    async testCases(testCasesResults: TTestCases[]) {
+        const { data: testCase, error } = await asyncHandler(prisma.testCases.createMany({
+            data: testCasesResults
+        }))
+
         if (error) {
             return null
         }
-        return testCase as unknown as TTestCases
+
+        return testCase as unknown as TTestCases[]
     }
-    
-    
+
+    async getAllSubmissions(data: TUserId) {
+        const { data: allSubmissions, error } = await asyncHandler(prisma.submissions.findMany({
+            where: {
+                userId: data.userId
+            }
+        }))
+
+        if (error) {
+            return null
+        }
+
+        return allSubmissions as unknown as TSubmission[]
+    }
+
+    async getSubmissionByProblemId(data: TUserId) {
+        const { data: submissionByProblemId, error } = await asyncHandler(prisma.submissions.findMany({
+            where: {
+                userId: data.userId,
+                problemId: data.problemId
+            }
+        }))
+
+        if (error) {
+            return null
+        }
+
+        return submissionByProblemId as unknown as TSubmission[]
+    }
+
+    async getSubmissionCount(problemId: string) {
+        const { data: submissionCount, error } = await asyncHandler(prisma.submissions.count({
+            where: {
+                problemId : problemId
+            }
+        }))
+
+        if (error) {
+            return null
+        }
+
+        return submissionCount as unknown as number
+    }
 
 }
 
