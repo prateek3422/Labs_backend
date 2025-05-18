@@ -26,47 +26,49 @@ enum ProblemDifficulty {
 }
 
 model Users {
-  id           String          @id @default(uuid()) @db.Uuid
-  name         String          @db.VarChar(191)
-  email        String          @unique
-  image        String?
-  role         UserRole        @default(USER)
-  password     String
-  refreshToken String          @default("")
-  otp          String          @default("")
-  isVerified   Boolean         @default(false)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  problems     Problems[]
-  submissions  Submissions[]
-  solvedProblems     ProblemSolved[]
-  playlist     Playlist[]
+  id             String            @id @default(uuid()) @db.Uuid
+  name           String            @db.VarChar(191)
+  email          String            @unique
+  image          String?
+  role           UserRole          @default(USER)
+  password       String
+  refreshToken   String            @default("")
+  otp            String            @default("")
+  isVerified     Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  problems       Problems[]
+  submissions    Submissions[]
+  solvedProblems ProblemSolved[]
+  playlist       Playlist[]
+  userActivity   UserActivity[]
+  comunity       Comunity[]
+  Commentby      ComunityComment[]
 }
 
 model Problems {
-  id          String            @id @default(uuid()) @db.Uuid
-  title       String            @db.VarChar(191)
-  description String
-  tags        String[]
-  difficulty  ProblemDifficulty @default(EASY)
-  userId      String            @db.Uuid
-  example     Json
-  constraints String
-  hints       String?
-  editorial   String?
-
+  id                 String            @id @default(uuid()) @db.Uuid
+  title              String            @db.VarChar(191)
+  description        String
+  tags               String[]
+  difficulty         ProblemDifficulty @default(EASY)
+  userId             String            @db.Uuid
+  example            Json
+  constraints        String
+  hints              String?
+  editorial          String?
   testCases          Json
   codeSnippet        Json
   referenceSolutions Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   //RELATIONSHIPS
   user             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
   submissions      Submissions[]
-  solvedBy   ProblemSolved[]
+  solvedBy         ProblemSolved[]
   problemPlaylists problemInPlaylist[]
+  userActivity     UserActivity[]
 }
 
 model Submissions {
@@ -153,15 +155,69 @@ model problemInPlaylist {
   @@unique([problemId, playlistId])
 }
 
-// model UserActivity {
+model UserActivity {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  problemId String[]   @db.Uuid
+  activity  Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //RELATIONSHIPS
+  user    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+model Comunity {
+  id        String            @id @default(uuid()) @db.Uuid
+  title     String
+  content   String
+  userId    String            @db.Uuid
+  tags      String[]
+  image     String?
+  view      Int               @default(0)
+  upvote    Int               @default(0)
+  downvote  Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  comments  ComunityComment[]
+  user      Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ComunityComment {
+  id         String   @id @default(uuid()) @db.Uuid
+  comunityId String   @db.Uuid
+  userId     String   @db.Uuid
+  comment    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  //RELATIONSHIPS
+  comunity Comunity @relation(fields: [comunityId], references: [id], onDelete: Cascade)
+  user     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// model Contest {
+//   id          String            @id @default(uuid()) @db.Uuid
+//   name        String
+//   description String?
+//   startTime   DateTime
+//   endTime     DateTime
+//   createdAt   DateTime          @default(now())
+//   updatedAt   DateTime          @updatedAt
+//   problems    ContestProblems[]
+// }
+
+// model ContestProblems {
 //   id        String   @id @default(uuid()) @db.Uuid
-//   userId    String   @db.Uuid
+//   contestId String   @db.Uuid
 //   problemId String   @db.Uuid
-//   activity  String
 //   createdAt DateTime @default(now())
 //   updatedAt DateTime @updatedAt
 
 //   //RELATIONSHIPS
-//   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-// }
+//   contest Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+//   problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
+//   @@unique([contestId, problemId])
+// }
