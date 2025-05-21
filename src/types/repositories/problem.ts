@@ -73,9 +73,21 @@ export type TProblemCreate = {
 export type TProblemId = {
     id: string
 }
+
+export type TGetProblems = {
+    page: number
+    limit: number
+    query: string
+    difficulty: "EASY" | "MEDIUM" | "HARD"
+    tags: string[]
+    sort: {
+        field: string
+        order: "asc" | "desc"
+    }
+}
 export interface IProblemRepo {
     createProblem(data: TProblemCreate): Promise<null | TProblem>
-    getProblems(): Promise<null | TProblem[]>
+    getProblems(data: TGetProblems): Promise<null | TProblem[]>
     getProblemById(data: TProblemId): Promise<null | TProblem>
     updateProblem(data: TProblem): Promise<null | TProblem>
     deleteProblem(data: TProblemId, id : TProblemId): Promise<null | TProblem>

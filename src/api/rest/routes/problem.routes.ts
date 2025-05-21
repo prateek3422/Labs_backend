@@ -10,4 +10,5 @@ router.post("/createProblem",  authMiddleware, AdminMiddleware,AsyncErrorHandler
 router.get("/getAllProblems",  AsyncErrorHandler(problemController.getAllProblems))
 router.get("/getProblems/:id",  AsyncErrorHandler(problemController.getProblemById))
 
+
 export {router as problemRouter}

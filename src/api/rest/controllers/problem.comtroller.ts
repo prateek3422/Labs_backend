@@ -8,6 +8,7 @@ import { problemService } from "@/services/problem.service";
 class ProblemController {
     createProblem = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { data, error } = createProblemValidation.safeParse(request.body)
+        
 
         if (error) {
             return next(new HttpError(error?.issues[0]?.message, 400))
@@ -31,8 +32,23 @@ class ProblemController {
         }
     }
 
-    getAllProblems = async (_: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const result = await problemService.getAllProblemsService()
+    getAllProblems = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const {page="1", limit="10", query, difficulty, tags, sortBy, sortOrder} = request.query
+        
+        const result = await problemService.getAllProblemsService({
+            page: Number(page),
+            limit: Number(limit),
+            query: query as string,
+            tags: tags as string[],
+            difficulty: difficulty as "EASY" | "MEDIUM" | "HARD",
+            sort:{
+                field: sortBy as string,
+                order: sortOrder as "asc" | "desc"
+            }
+
+        })
+
+
 
         if (result.statusCode === 200) {
             response.status(result.statusCode).json({

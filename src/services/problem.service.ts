@@ -1,5 +1,5 @@
 import { problemRepo } from "@/repositories/queries/problem"
-import { TProblem, TProblemCreate } from "@/types/repositories"
+import { TGetProblems, TProblem, TProblemCreate } from "@/types/repositories"
 import { getJudge0Languages, pollBatchResults, submitBatch } from "@/utils/judge0"
 
 interface SubmissionResponse {
@@ -78,8 +78,8 @@ class ProblemService {
 
     }
 
-    getAllProblemsService = async () => {
-        const problems = await problemRepo.getProblems()
+    getAllProblemsService = async ({page, limit, query, difficulty, tags, sort,}: TGetProblems) => {
+        const problems = await problemRepo.getProblems({page, limit, query, difficulty, tags, sort, })
 
         if (!problems) {
             return {

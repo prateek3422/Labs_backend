@@ -1,4 +1,5 @@
 export type TPlaylist = {
+    id?: string
     name: string
     description?: string
     userId: string

@@ -57,7 +57,6 @@ class SubmissionService {
 
         })
 
-
         const language = getLanguage(data.language_id)
 
         const SavedSubmission = await executeRepo.submission({
@@ -73,6 +72,8 @@ class SubmissionService {
             time: detailedResults.some((result) => result.time) ? JSON.stringify(detailedResults.map((result) => result.time)) : "",
             memory: detailedResults.some((result) => result.memory) ? JSON.stringify(detailedResults.map((result) => result.memory)) : "",
         })
+
+       
 
         if (!SavedSubmission) {
             return {
@@ -91,7 +92,6 @@ class SubmissionService {
             })
         }
 
-
         const testCasesResults = detailedResults.map((result) => ({
             submissionId: SavedSubmission.id,
             testCase: result.testCase,
@@ -105,9 +105,10 @@ class SubmissionService {
             time: result.time
         }))
 
-
+        
         // @ts-expect-error does not exist on type 'PrismaClient'
-        const savedTestCases = await executeRepo.testCases({testCasesResults})
+        const savedTestCases = await executeRepo.testCases(testCasesResults)
+
 
 
         if (!savedTestCases) {

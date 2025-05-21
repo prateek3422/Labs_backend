@@ -158,7 +158,7 @@ model problemInPlaylist {
 model UserActivity {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
-  problemId String[]   @db.Uuid
+  problemId String   @db.Uuid
   activity  Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -166,6 +166,8 @@ model UserActivity {
   //RELATIONSHIPS
   user    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, problemId])
 }
 
 model Comunity {

@@ -29,9 +29,8 @@ class ExecuteService {
             }
         }
 
-
+        
         // praper test cases for judge0 batch submission
-
         const submission = data.stdin.map((input) => (
             {
                 source_code: data.source_code,
@@ -46,7 +45,6 @@ class ExecuteService {
         const token = submissionResponse.map((response) => response.token)
 
         const result = await pollBatchResults(token)
-
         // analyze test cases
 
         let allPassed = true;

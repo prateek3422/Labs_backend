@@ -115,6 +115,47 @@ CREATE TABLE "problemInPlaylist" (
     CONSTRAINT "problemInPlaylist_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "UserActivity" (
+    "id" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+    "problemId" UUID NOT NULL,
+    "activity" BOOLEAN NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserActivity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Comunity" (
+    "id" UUID NOT NULL,
+    "title" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "userId" UUID NOT NULL,
+    "tags" TEXT[],
+    "image" TEXT,
+    "view" INTEGER NOT NULL DEFAULT 0,
+    "upvote" INTEGER NOT NULL DEFAULT 0,
+    "downvote" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Comunity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ComunityComment" (
+    "id" UUID NOT NULL,
+    "comunityId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+    "comment" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ComunityComment_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
 
@@ -129,6 +170,9 @@ CREATE UNIQUE INDEX "Playlist_name_userId_key" ON "Playlist"("name", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "problemInPlaylist_problemId_playlistId_key" ON "problemInPlaylist"("problemId", "playlistId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserActivity_userId_problemId_key" ON "UserActivity"("userId", "problemId");
 
 -- AddForeignKey
 ALTER TABLE "Problems" ADD CONSTRAINT "Problems_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -156,3 +200,18 @@ ALTER TABLE "problemInPlaylist" ADD CONSTRAINT "problemInPlaylist_problemId_fkey
 
 -- AddForeignKey
 ALTER TABLE "problemInPlaylist" ADD CONSTRAINT "problemInPlaylist_playlistId_fkey" FOREIGN KEY ("playlistId") REFERENCES "Playlist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserActivity" ADD CONSTRAINT "UserActivity_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserActivity" ADD CONSTRAINT "UserActivity_problemId_fkey" FOREIGN KEY ("problemId") REFERENCES "Problems"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comunity" ADD CONSTRAINT "Comunity_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ComunityComment" ADD CONSTRAINT "ComunityComment_comunityId_fkey" FOREIGN KEY ("comunityId") REFERENCES "Comunity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ComunityComment" ADD CONSTRAINT "ComunityComment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

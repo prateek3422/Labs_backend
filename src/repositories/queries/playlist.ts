@@ -66,13 +66,14 @@ class PlaylistRepo implements IPlaylistRepo {
         return playlist as TPlaylist
     }
 
-    async addProblemToPlaylist(data: TPlaylistId) {
+    async addProblemToPlaylist({playlistId,problemId}: TPlaylistId) {
         const { data: playlist, error } = await asyncHandler(prisma.problemInPlaylist.createMany({
-            data: data.problemId.map((id) => ({
-                problemId: id,
-                playlistId: data?.playlistId
-            }))
+            data: problemId.map((problemId) => ({
+                problemId,
+                playlistId
+            })),
         }))
+
         if (error) {
             return null
         }

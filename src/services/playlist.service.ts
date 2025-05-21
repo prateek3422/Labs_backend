@@ -80,7 +80,18 @@ class PlaylistService {
     }
 
     async addProblemToPlaylist(playlistId: string, problemId: string[]) {
-        const addProblemToPlaylist = await playlistRepo.addProblemToPlaylist({playlistId, problemId})
+        const getPlaylist = await playlistRepo.getPlaylistDetails(playlistId)
+      
+        if (!getPlaylist) {
+            return {
+                statusCode: 400,
+                message: "error getting playlist",
+                data: null
+            }
+        }
+
+        
+        const addProblemToPlaylist = await playlistRepo.addProblemToPlaylist({playlistId: getPlaylist?.id as string, problemId})
         // console.log(addProblemToPlaylist, "addProblemToPlaylist")
 
         if (!addProblemToPlaylist) {

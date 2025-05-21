@@ -1,25 +1,60 @@
 import { asyncHandler } from "@/configs/handler";
-import { IProblemRepo, TProblem, TProblemCreate, TProblemId } from "@/types/repositories";
+import { IProblemRepo, TGetProblems, TProblem, TProblemCreate, TProblemId } from "@/types/repositories";
 import { prisma } from "../database";
 
-class ProblemRepo implements IProblemRepo{
+class ProblemRepo implements IProblemRepo {
     async createProblem(data: TProblemCreate) {
-        const { data: problem, error } = await asyncHandler(prisma.problems.create({data}))
+        const { data: problem, error } = await asyncHandler(prisma.problems.create({ data }))
         if (error) {
             return null
         }
         return problem as unknown as TProblem
     }
 
-    async getProblems() {
-        const { data: problems, error } = await asyncHandler(prisma.problems.findMany())
+    async getProblems({ page, limit, query, difficulty, tags }: TGetProblems) {
+
+        
+        const tagsArray = Array.isArray(tags) ? tags : tags
+        // console.log(tagsArray, "tags")
+       
+        const { data: problems, error } = await asyncHandler(prisma.problems.findMany({
+            skip: (page - 1) * limit,
+            take: limit,
+            where: {
+                AND: [
+                    // Search query filter
+                    query ? {
+                        title:{
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    } : {},
+
+                    // Difficulty filter
+                    difficulty ? { difficulty } : {},
+
+
+                    // Tags filter - assuming tags are in a related table
+                    tagsArray && tagsArray.length > 0 ? {
+                        tags: {
+                            hasSome: tagsArray,
+                        }
+                    } : {},
+                ]
+            },
+            orderBy: {
+                difficulty: "asc",
+            },
+
+        }))
         if (error) {
             return null
         }
-        return problems as unknown as TProblem[]   }
+        return problems as unknown as TProblem[]
+    }
 
     async getProblemById(data: TProblemId) {
-        const {data:problem, error} = await asyncHandler(prisma.problems.findUnique({where: {id: data.id}}))
+        const { data: problem, error } = await asyncHandler(prisma.problems.findUnique({ where: { id: data.id } }))
 
         if (error) {
             return null
@@ -29,14 +64,14 @@ class ProblemRepo implements IProblemRepo{
     }
 
     async deleteProblem(data: TProblemId) {
-        const {data: deleteProblem, error} = await asyncHandler(prisma.problems.delete({where: {id: data.id}}))
+        const { data: deleteProblem, error } = await asyncHandler(prisma.problems.delete({ where: { id: data.id } }))
 
-        if(error){
+        if (error) {
             return null
         }
 
         return deleteProblem as unknown as TProblem
-        
+
     }
 
     async updateProblem(data: TProblem) {

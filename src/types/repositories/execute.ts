@@ -3,7 +3,7 @@ export type TSubmission = {
     id?: string;
     userId: string;
     problemId: string;
-    sourceCode: Record<string, string>;
+    sourceCode:string | Record<string, string>;
     language: string;
     stdin: string;
     stdout: string;
@@ -20,7 +20,7 @@ export type TSolvedProblem = {
 }
 
 export type TExecute = {
-    source_code: Record<string, string>;
+    source_code:string | Record<string, string>;
     language_id: number;
     stdin: string[];
     expected_output: string[];

@@ -65,6 +65,7 @@ export const getLanguage = (language_id : number) => {
 }
 
 export const submitBatch = async (submissions: JudgeSubmission[]) => {
+
   const response = await axios.post<BatchSubmissionResponse>(
     `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`,
     { submissions }
