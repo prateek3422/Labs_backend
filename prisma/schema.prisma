@@ -44,6 +44,9 @@ model Users {
   userActivity   UserActivity[]
   comunity       Comunity[]
   Commentby      ComunityComment[]
+  upvote         ComunityUpvote[]
+
+  @@index([email])
 }
 
 model Problems {
@@ -167,7 +170,7 @@ model UserActivity {
   user    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
-    @@unique([userId, problemId])
+  @@unique([userId, problemId])
 }
 
 model Comunity {
@@ -178,10 +181,9 @@ model Comunity {
   tags      String[]
   image     String?
   view      Int               @default(0)
-  upvote    Int               @default(0)
-  downvote  Int               @default(0)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
+  upvotes   ComunityUpvote[]
   comments  ComunityComment[]
   user      Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -197,6 +199,19 @@ model ComunityComment {
   //RELATIONSHIPS
   comunity Comunity @relation(fields: [comunityId], references: [id], onDelete: Cascade)
   user     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ComunityUpvote {
+  id         String   @id @default(uuid()) @db.Uuid
+  comunityId String   @db.Uuid
+  userId     String   @db.Uuid
+  upvote     Int   @default(0)
+  downvote   Int   @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  //RELATIONSHIPS
+  comunity   Comunity @relation(fields: [comunityId], references: [id], onDelete: Cascade)
+  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // model Contest {
