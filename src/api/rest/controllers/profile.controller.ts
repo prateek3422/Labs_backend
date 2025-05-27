@@ -15,6 +15,7 @@ class ProfileController {
             return next(new HttpError("User not found", 400));
         }
 
+        //@ts-expect-error       if (!files || !files.image || !Array.isArray(files.image) || files.image.length === 0) 
         const result = await profileService.uploadProfilePicture({ files, userId});
 
         return result.statusCode === 200 ? response.status(result.statusCode).json({
