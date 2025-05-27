@@ -1,15 +1,14 @@
 export type TUser = {
     id: string
     name: string
-    image: string
+    image: Record<string, string>
     email: string
     role: string
     refreshToken: string
     otp: string
     isVerified?: boolean
+    LoginType?: string
     password: string
-    createdAt: Date
-    updatedAt: Date
 }
 
 export type IcreateUser = {
@@ -18,7 +17,9 @@ export type IcreateUser = {
     password: string
     refreshToken?: string
     otp?: string
-
+    isVerified?: boolean
+    LoginType?: string
+    image?: Record<string, string> | string
 }
 
 export type IVerifyUser = {
@@ -48,4 +49,5 @@ export interface IUserRepo {
     createUser(data: IcreateUser): Promise<null | TUser>
     verifyUser(data: IcreateUser): Promise<null | IVerifyUser>
     updateUserPassword(data: IUpateUserPassword): Promise<null | TUser>
+    updateUser(data: TUser): Promise<null | TUser>
 }

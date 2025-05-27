@@ -9,40 +9,36 @@ class UserRepo implements IUserRepo {
             return null
         }
 
-        return signUp as TUser
+        return signUp as unknown as TUser
     }
-
     async getSingleUser(data: ISingleUser) {
-        const { data: signleUser, error } = await asyncHandler(prisma.users.findFirst({ where: { OR: [{ email: data?.email }, { id: data?.id }, {refreshToken: data?.refreshToken}] } }))
+        const { data: signleUser, error } = await asyncHandler(prisma.users.findFirst({ where: { OR: [{ email: data?.email }, { id: data?.id }, { refreshToken: data?.refreshToken }] } }))
 
         if (error) {
             return null
         }
-        return signleUser as TUser
+        return signleUser as unknown as TUser
     }
-
     async getUser() {
         const { data: users, error } = await asyncHandler(prisma.users.findFirst())
 
         if (error) {
             return null
         }
-        return users as TUser
+        return users as unknown as TUser
     }
-
     async getUsers() {
         const { data: allUsers, error } = await asyncHandler(prisma.users.findMany())
         if (error) {
             return []
         }
-        return allUsers as TUser[]
+        return allUsers as unknown as TUser[]
     }
-
     async updateUserPassword(data: IUpateUserPassword) {
         const { data: updateuserPass, error } = await asyncHandler(
             prisma.users.update({
                 where: { email: data?.email },
-                data :{
+                data: {
                     password: data?.password,
                     otp: data?.otp,
                     refreshToken: data?.refreshToken
@@ -54,7 +50,7 @@ class UserRepo implements IUserRepo {
             return null
         }
 
-        return updateuserPass as TUser
+        return updateuserPass as unknown as TUser
     }
     async verifyUser(data: IVerifyUser): Promise<IVerifyUser | null> {
         const { data: verify, error } = await asyncHandler(
@@ -68,7 +64,25 @@ class UserRepo implements IUserRepo {
             return null
         }
 
-        return verify as TUser
+        return verify as unknown as TUser
+    }
+    async updateUser(data: TUser) {
+        const { data: updatedUser, error } = await asyncHandler(
+            prisma.users.update({
+                where: { id: data?.id },
+                data: {
+                    name: data?.name,
+                    image: data?.image,
+                    email: data?.email,
+                }
+            })
+        )
+
+        if (error) {
+            return null
+        }
+
+        return updatedUser as unknown as TUser
     }
 }
 

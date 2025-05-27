@@ -34,6 +34,29 @@ class UserController {
         }
     }
 
+    handleSocialLogin = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const userId = request.user?.id
+        if (!userId) {
+            return next(new HttpError("User ID is required for social login", 400))
+        }
+        const result = await userService.handleSocialLoginService(userId)
+
+
+        if (result.statusCode === 301) {
+            response.status(result.statusCode).cookie("accessToken", result?.data?.AccessToken, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true
+            }).cookie("refreshToken", result?.data?.RefreshToken, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true
+            }).redirect(myEnvironment.CLIENT_REDIRECT_URL)
+        } else {
+            return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+        }
+    }
+
     verifyEmail = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { data, error } = ermailVerifyValidation.safeParse(request.body)
 
@@ -128,14 +151,14 @@ class UserController {
 
         const result = await userService.logoutUSerService(id)
 
-        if(result.statusCode === 200){
+        if (result.statusCode === 200) {
             response.status(result.statusCode).clearCookie("AccessToken").clearCookie("RefreshToken").json({
                 statusCode: result.statusCode,
                 message: result.message,
                 data: result.data
             })
-        }else{
-         return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+        } else {
+            return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
         }
     }
 
@@ -175,11 +198,11 @@ class UserController {
 
 
     refreshToken = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const token  = request.cookies as {
+        const token = request.cookies as {
             RefreshToken: string
         }
 
-        if(!token){
+        if (!token) {
             return next(new HttpError("Refresh token is required", 400))
         }
 
@@ -203,7 +226,7 @@ class UserController {
                     message: result.message,
                     data: result.data
                 })
-        }else{
+        } else {
             return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
         }
     }
@@ -238,7 +261,7 @@ class UserController {
         const tokenData = request?.tokenData as {
             email: string
         }
-        if(!tokenData) {
+        if (!tokenData) {
             return next(new HttpError("Invalid token", 400))
         }
         const result = await userService.resetPasswordService({

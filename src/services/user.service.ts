@@ -9,8 +9,7 @@ import { tokenUtilities } from "@/utils/tokenUtile"
 class UserService {
     createUserService = async (data: IcreateUser) => {
         //* check if user exist or not
-        const user = await userRepo.getUser()
-
+        const user = await userRepo.getSingleUser({ email: data.email })
         if (user) {
             return {
                 statusCode: 400,
@@ -70,6 +69,38 @@ class UserService {
         }
     }
 
+    handleSocialLoginService = async (userId: string) => {
+        const user = await userRepo.getSingleUser({ id: userId })
+        if (!user) {
+            return {
+                statusCode: 400,
+                error: "User not found",
+                data: null
+            }
+        }
+
+        const AccessToken = tokenUtilities.sign({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        }, myEnvironment.ACCESS_TOKEN, myEnvironment.ACCESS_TOKEN_EXPAIRY)
+        const RefreshToken = tokenUtilities.sign({
+            id: user.id,
+            email: user.email
+        }, myEnvironment.REFRESH_TOKEN, myEnvironment.REFRESH_TOKEN_EXPAIRY)
+
+
+       
+        return {
+            statusCode: 301,
+            data: {
+
+                AccessToken,
+                RefreshToken,
+            }
+        }
+    }
     verifyUserService = async ({ otp, email }: { otp: string; email: string }) => {
         const user = await userRepo.getSingleUser({ email })
 
@@ -120,6 +151,7 @@ class UserService {
     resendEmailService = async (email: string) => {
         const user = await userRepo.getSingleUser({ email })
 
+
         if (!user) {
             return {
                 statusCode: 400,
@@ -130,6 +162,15 @@ class UserService {
             }
         }
 
+        if (user.isVerified) {
+            return {
+                statusCode: 400,
+                error: "user already verified",
+                data: {
+                    user: null
+                }
+            }
+        }
         // generate otp
 
         const newOtp = String(generateOtp(6))
@@ -207,8 +248,8 @@ class UserService {
                 email: user.email,
                 role: user.role
             },
-            myEnvironment.ACCESS_TOKEN as string,
-            myEnvironment.ACCESS_TOKEN_EXPAIRY as string
+            myEnvironment.ACCESS_TOKEN,
+            myEnvironment.ACCESS_TOKEN_EXPAIRY
         )
 
         const RefreshToken = tokenUtilities.sign(
@@ -216,8 +257,8 @@ class UserService {
                 id: user.id,
                 email: user.email
             },
-            myEnvironment.REFRESH_TOKEN as string,
-            myEnvironment.REFRESH_TOKEN_EXPAIRY as string
+            myEnvironment.REFRESH_TOKEN,
+            myEnvironment.REFRESH_TOKEN_EXPAIRY
         )
 
         await userRepo.verifyUser({
@@ -285,8 +326,6 @@ class UserService {
                 role: user.role,
                 verified: user.isVerified,
                 image: user.image,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
             }
         }
     }
@@ -312,8 +351,6 @@ class UserService {
                 role: user.role,
                 verified: user.isVerified,
                 image: user.image,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
             }))
         }
     }
@@ -329,7 +366,7 @@ class UserService {
             }
         }
 
-        const decoded = tokenUtilities.verify(token, myEnvironment.REFRESH_TOKEN as string)
+        const decoded = tokenUtilities.verify(token, myEnvironment.REFRESH_TOKEN)
 
         if (!decoded) {
             return {
@@ -346,8 +383,8 @@ class UserService {
                 email: user.email,
                 role: user.role
             },
-            myEnvironment.ACCESS_TOKEN as string,
-            myEnvironment.ACCESS_TOKEN_EXPAIRY as string
+            myEnvironment.ACCESS_TOKEN,
+            myEnvironment.ACCESS_TOKEN_EXPAIRY
         )
 
         const newRefreshToken = tokenUtilities.sign(
@@ -355,8 +392,8 @@ class UserService {
                 id: user.id,
                 email: user.email
             },
-            myEnvironment.REFRESH_TOKEN as string,
-            myEnvironment.REFRESH_TOKEN_EXPAIRY as string
+            myEnvironment.REFRESH_TOKEN,
+            myEnvironment.REFRESH_TOKEN_EXPAIRY
         )
 
         await userRepo.verifyUser({

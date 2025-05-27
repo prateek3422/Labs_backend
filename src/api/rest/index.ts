@@ -5,16 +5,29 @@ import { globalErrorHandler, notFoundHandler } from "./configs"
 import cors, { CorsOptions } from "cors"
 import cookieParser from "cookie-parser"
 import { commentRouter, comunityRoute, executeRouter, playlistRoute, problemRouter, submissionRouter, userRouter } from "./routes"
-
+import passport from "passport"
+import session from "express-session";
+import { myEnvironment } from "@/configs"
 const app = express()
 
 const corsOptions: CorsOptions = {
-    origin: "*",
+    origin: "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }
 app.use(cors(corsOptions))
+
+//passport configuration
+
+app.use(session({
+    secret: myEnvironment.SECRECT,
+    resave: false,
+    saveUninitialized: true,
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 //middlewares
 app.use(express.json({ limit: "1mb" }))

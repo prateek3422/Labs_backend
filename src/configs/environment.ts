@@ -12,7 +12,19 @@ const _environment = {
     REFRESH_TOKEN_EXPAIRY: process.env.REFRESH_TOKEN_EXPAIRY || "10D",
     ACCESS_TOKEN: process.env.ACCESS_TOKEN || "kasajkahsahsjahjsab",
     ACCESS_TOKEN_EXPAIRY: process.env.ACCESS_TOKEN_EXPAIRY || "60m",
-    JUDGE0_API: process.env.JUDGE_API_URL || "http://localhost:2358"
+    JUDGE0_API: process.env.JUDGE_API_URL || "http://localhost:2358",
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "your-cloud-name",
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "your-api-key",
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "your-api-secret",
+    CLOUDINARY_URL: process.env.CLOUDINARY_URL || "https://api.cloudinary.com/v1_1/your-cloud-name/image/upload",
+    SECRECT: process.env.SECRECT ||  "your-secret-key",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "your-google-client-id",
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "your-google-client-secret",
+    CALLBACK_URL: process.env.CALLBACK_URL || "http://localhost:5000/api/v1/users/auth/google/callback",
+    CLIENT_REDIRECT_URL: process.env.CLIENT_REDIRECT_URL || "http://localhost:5173",
+    GITHUB_CLIENT_ID: process.env.GIT_CLIENT_ID || "your-github-client-id",
+    GITHUB_CLIENT_SECRET: process.env.GIT_CLIENT_SECRET || "your-github-client-secret",
+    GITHUB_CALLBACK_URL: process.env.GIT_CALLBACK_URL || "http://localhost:5000/api/v1/users/auth/github/callback",
 }
 
 export const myEnvironment = Object.freeze(_environment)
