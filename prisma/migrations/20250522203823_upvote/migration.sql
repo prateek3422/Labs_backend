@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "ComunityUpvote" ADD COLUMN     "downvote" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "upvote" INTEGER NOT NULL DEFAULT 0;

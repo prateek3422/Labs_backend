@@ -32,10 +32,23 @@ export type TProblem = {
     tags: string[];
     difficulty: "EASY" | "MEDIUM" | "HARD";
     example: {
-        input: string;
-        output: string;
-        explanation?: string;
-    }[];
+        JAVASCRIPT: {
+            input: string;
+            output: string;
+            explanation?: string;
+        },
+        PYTHON: {
+            input: string;
+            output: string;
+            explanation?: string;
+        },
+        JAVA: {
+            input: string;
+            output: string;
+            explanation?: string;
+        }
+
+    };
     userId: string;
     constraints: string;
     hints?: string;
@@ -56,10 +69,23 @@ export type TProblemCreate = {
     tags: string[]
     difficulty: "EASY" | "MEDIUM" | "HARD"
     example: {
-        input: string;
-        output: string;
-        explanation?: string;
-    }[];
+        JAVASCRIPT: {
+            input: string;
+            output: string;
+            explanation?: string;
+        },
+        PYTHON: {
+            input: string;
+            output: string;
+            explanation?: string;
+        },
+        JAVA: {
+            input: string;
+            output: string;
+            explanation?: string;
+        }
+
+    };
     constraints: string
     testCases: {
         input: string;
@@ -91,4 +117,6 @@ export interface IProblemRepo {
     getProblemById(data: TProblemId): Promise<null | TProblem>
     updateProblem(data: TProblem): Promise<null | TProblem>
     deleteProblem(data: TProblemId, id : TProblemId): Promise<null | TProblem>
+    getAllProblemsSolvedByUser(userId: string ): Promise<null | TProblem[]>
+    
 }

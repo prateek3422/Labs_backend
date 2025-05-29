@@ -98,6 +98,31 @@ class ProblemRepo implements IProblemRepo {
 
         return updateProblem as unknown as TProblem;
     }
+
+    async getAllProblemsSolvedByUser(userId: string ) {
+        const { data: problems, error } = await asyncHandler(prisma.problems.findMany({
+            where: {
+                solvedBy:{
+                    some:{
+                        userId: userId
+                    }
+                }
+            },
+            include:{
+                solvedBy:{
+                    where:{
+                        userId: userId
+                    }
+                }
+            }
+        }))
+
+        if (error) {
+            return null
+        }
+
+        return problems as unknown as TProblem[]
+    }
 }
 
 

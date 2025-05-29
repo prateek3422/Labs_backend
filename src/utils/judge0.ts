@@ -1,11 +1,11 @@
-import { myEnvironment } from "@/configs";
+import { logger, myEnvironment } from "@/configs";
 import axios from "axios";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface JudgeSubmission {
 
-  source_code: string | Record<string, string>; 
+  source_code: Record<string,string> | string
   language_id: number;
   stdin: string;
   expected_output?: string;
@@ -65,15 +65,23 @@ export const getLanguage = (language_id : number) => {
 }
 
 export const submitBatch = async (submissions: JudgeSubmission[]) => {
+  try {
+    const response = await axios.post<BatchSubmissionResponse>(
+      `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`,
+      { submissions }
+    );
+    // console.log("Batch submission successful. Response:", response);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      logger.error("Axios Error:", error.response?.data || error.message);
+    } else {
+      logger.error("Unexpected Error:", error);
+    }
+    throw error;
+  }
+};
 
-  const response = await axios.post<BatchSubmissionResponse>(
-    `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`,
-    { submissions }
-  );
-
-  return response.data;
-
-}
 
 export const pollBatchResults = async (tokens: string[]): Promise<JudgeResult[]> => {
   while (true) {

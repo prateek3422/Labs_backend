@@ -29,6 +29,7 @@ class ExecuteService {
             }
         }
 
+        // console.log(data)
         
         // praper test cases for judge0 batch submission
         const submission = data.stdin.map((input) => (
@@ -38,6 +39,8 @@ class ExecuteService {
                 stdin: input,
             }
         ))
+
+        // console.log("Submission prepared for batch execution:", submission);
 
         // send batch submission to judge0
         const submissionResponse = await submitBatch(submission) as unknown as SubmissionResponse[];
@@ -68,9 +71,6 @@ class ExecuteService {
                 time: result.time ? `${result.time} seconds` : undefined,
                 allPassed
             };
-
-
-
         })
 
 

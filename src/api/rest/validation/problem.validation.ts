@@ -10,11 +10,11 @@ export const difficultyEnum = z.enum([
 });
 
 // Define reusable schemas
-const exampleSchema = z.object({
-    input: z.string({ required_error: "Example input is required" }),
-    output: z.string({ required_error: "Example output is required" }),
-    explanation: z.string().optional(),
-});
+// const exampleSchema = z.object({
+//     input: z.string({ required_error: "Example input is required" }),
+//     output: z.string({ required_error: "Example output is required" }),
+//     explanation: z.string().optional(),
+// });
 
 const testCaseSchema = z.object({
     input: z.string({ required_error: "Test case input is required" }),
@@ -35,9 +35,23 @@ const createProblemValidation = z.object({
         .nonempty("At least one tag is required"),
 
     difficulty: difficultyEnum,
-
-    example: z.array(exampleSchema)
-        .nonempty("At least one example is required"),
+    example: z.object({
+        JAVASCRIPT: z.object({
+            input: z.string().min(1, "Input is required"),
+            output: z.string().min(1, "Output is required"),
+            explanation: z.string().optional(),
+        }),
+        PYTHON: z.object({
+            input: z.string().min(1, "Input is required"),
+            output: z.string().min(1, "Output is required"),
+            explanation: z.string().optional(),
+        }),
+        JAVA: z.object({
+            input: z.string().min(1, "Input is required"),
+            output: z.string().min(1, "Output is required"),
+            explanation: z.string().optional(),
+        }),
+      }),
 
     constraints: z.string({ required_error: "Constraints are required" }).nonempty("At least one constraint is required"),
 
@@ -45,13 +59,21 @@ const createProblemValidation = z.object({
         .min(1, { message: "At least one test case is required" })
         .max(10, { message: "Maximum 10 test cases are allowed" }),
 
-    codeSnippet: z.record(z.string()),
+    codeSnippet: z.object({
+        JAVASCRIPT: z.string().min(1, "JavaScript code snippet is required"),
+        PYTHON: z.string().min(1, "Python code snippet is required"),
+        JAVA: z.string().min(1, "Java solution is required"),
+          }),
 
-    referenceSolutions: z.record(z.string()),
+    referenceSolutions: z.object({
+        JAVASCRIPT: z.string().min(1, "JavaScript solution is required"),
+        PYTHON: z.string().min(1, "Python solution is required"),
+        JAVA: z.string().min(1, "Java solution is required"),
+          }),
 
     hints: z.string().optional(),
 
-    editorial: z.any().optional(), // You might want to define a more specific schema for editorial
+    editorial: z.string().optional(), // You might want to define a more specific schema for editorial
 });
 
 // Create a partial schema for updates

@@ -18,6 +18,7 @@ class ProblemService {
         for (const [language, solCode] of Object.entries(data.referenceSolutions)) {
             const languageId = getJudge0Languages(language)
 
+
             if (!languageId) {
                 return {
                     statusCode: 400,
@@ -25,7 +26,7 @@ class ProblemService {
                     data: null
                 }
             }
-            // console.log(data, "data")
+            // console.log(solCode, "data")
 
             const submission = data.testCases.map(({ input, output }) => ({
                 source_code: solCode,
@@ -35,6 +36,7 @@ class ProblemService {
 
             }))
 
+
             const submittionResult = await submitBatch(submission) as unknown as SubmissionResponse[];
 
             // console.log(submittionResult, "tokens")
@@ -42,13 +44,13 @@ class ProblemService {
             const tokens: string[] = submittionResult.map((response: SubmissionResponse) => response.token)
 
             const results = await pollBatchResults(tokens) as JudgeResult[];
+            // console.log("result", results)     
 
             for (const [index, result] of results.entries()) {
-                // console.log("result", result)
                 if (result.status.id !== 3) {
                     return {
                         statusCode: 400,
-                        error: `Testcase ${index + 1} failed for language ${language}`,
+                        error: `Testcase ${index + 1} failed for language ${language} `,
                         data: null
                     }
                 }
@@ -78,8 +80,8 @@ class ProblemService {
 
     }
 
-    getAllProblemsService = async ({page, limit, query, difficulty, tags, sort,}: TGetProblems) => {
-        const problems = await problemRepo.getProblems({page, limit, query, difficulty, tags, sort, })
+    getAllProblemsService = async ({ page, limit, query, difficulty, tags, sort, }: TGetProblems) => {
+        const problems = await problemRepo.getProblems({ page, limit, query, difficulty, tags, sort, })
 
         if (!problems) {
             return {
@@ -116,7 +118,7 @@ class ProblemService {
 
     }
 
-    updateProblemService = async (data:TProblem ) =>{
+    updateProblemService = async (data: TProblem) => {
         const problem = await problemRepo.getProblemById({ id: data.id })
         if (!problem) {
             return {
@@ -136,7 +138,7 @@ class ProblemService {
                 }
             }
 
-            const submission  = data.testCases.map(({input, output}) => ({
+            const submission = data.testCases.map(({ input, output }) => ({
                 source_code: solCode,
                 language_id: languageId,
                 stdin: input,
@@ -168,7 +170,7 @@ class ProblemService {
             difficulty: data.difficulty,
             example: data.example,
             constraints: data.constraints,
-            hints: data.hints ,
+            hints: data.hints,
             editorial: data.editorial,
             testCases: data.testCases,
             codeSnippet: data.codeSnippet,
@@ -180,7 +182,7 @@ class ProblemService {
             statusCode: 201,
             message: "Problem update successfully",
             data: updatedProblem
-              }
+        }
     }
 
     deleteProblemService = async (id: string) => {
@@ -200,6 +202,25 @@ class ProblemService {
             data: problem
         }
     }
+
+    getAllProblemsSolvedByUserService = async (userId: string) => {
+        const problems = await problemRepo.getAllProblemsSolvedByUser(userId)
+
+        if (!problems) {
+            return {
+                statusCode: 404,
+                error: "No problems found",
+                data: null
+            }
+        }
+        return {
+            statusCode: 200,
+            message: "Problems fetched successfully",
+            data: problems
+        }
+    }
+
+
 
 }
 

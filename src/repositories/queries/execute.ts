@@ -36,11 +36,11 @@ class ExecuteRepo implements IExportRepo {
         return solvedProblem as unknown as TSolvedProblem
 
     }
-    //@ts-expect-error  it becomes a problem when we use the createMany
-    async testCases(data:{testCasesResults: TTestCases[]}) {
-        // console.log(testCasesResults)
+  
+    async testCases(data: TTestCases[]) {
+        // console.log(data)
         const { data: testCase, error } = await asyncHandler(prisma.testCases.createMany({
-            data: data?.testCasesResults
+            data: data
         }))
 
         if (error) {

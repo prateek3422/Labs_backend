@@ -104,7 +104,6 @@ class SubmissionService {
             memory: result.memory,
             time: result.time
         }))
-
         
         // @ts-expect-error does not exist on type 'PrismaClient'
         const savedTestCases = await executeRepo.testCases(testCasesResults)
