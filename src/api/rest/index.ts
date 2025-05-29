@@ -11,7 +11,7 @@ import { myEnvironment } from "@/configs"
 const app = express()
 
 const corsOptions: CorsOptions = {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://labs.traken.in"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
