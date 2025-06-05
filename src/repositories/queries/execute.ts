@@ -94,6 +94,21 @@ class ExecuteRepo implements IExportRepo {
         return submissionCount as unknown as number
     }
 
+    async getSolvedProblem(data: TUserId){
+        const { data: solvedProblem, error } = await asyncHandler(prisma.problemSolved.findMany({
+            where: {
+                userId: data.userId,
+                problemId: data.problemId
+            }
+        }))
+
+        if (error) {
+            return null
+        }
+
+        return solvedProblem as unknown as TSolvedProblem[]
+    }
+
 }
 
 

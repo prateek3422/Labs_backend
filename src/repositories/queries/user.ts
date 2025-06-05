@@ -1,4 +1,4 @@
-import { IcreateUser, ISingleUser, IUpateUserPassword, IUserRepo, IVerifyUser, TUser } from "@/types/repositories"
+import { IcreateUser, ISingleUser, IUpateUserPassword, IUserRepo, IVerifyUser, TUser, TUserActivity } from "@/types/repositories"
 import { prisma } from "../database"
 import { asyncHandler } from "@/configs/handler"
 
@@ -19,8 +19,19 @@ class UserRepo implements IUserRepo {
         }
         return signleUser as unknown as TUser
     }
-    async getUser() {
-        const { data: users, error } = await asyncHandler(prisma.users.findFirst())
+    async getUser(id:string) {
+        const { data: users, error } = await asyncHandler(prisma.users.findUnique({
+            where:{
+                id: id
+            },
+            include:{
+                solvedProblems: {
+                    select: {
+                        id: true,
+                    }
+                }
+            }
+        }))
 
         if (error) {
             return null
@@ -84,6 +95,43 @@ class UserRepo implements IUserRepo {
 
         return updatedUser as unknown as TUser
     }
+
+    async createUserActivity(data: TUserActivity) {
+        const { data: userActivity, error } = await asyncHandler(
+            prisma.userActivity.upsert({
+                where: { userId_problemId: { userId: data.userId, problemId: data.problemsolved } },
+                update: {
+                    problemId: data.problemsolved,
+                    problemSolvedId: data.problemsolved
+                },
+                create: {
+                    userId: data.userId,
+                    problemId: data.problemsolved,
+                    problemSolvedId: data.problemsolved
+                }
+            })
+        )
+
+        if (error) {
+            return null
+        }
+
+        return userActivity as unknown as TUser
+    }
+
+    // async getUserActivity(userId: string, problemId: string) {
+    //     const { data: userActivity, error } = await asyncHandler(
+    //         prisma.userActivity.findUnique({
+    //             where: { userId_problemId: { userId, problemId } },
+    //         })
+    //     )
+
+    //     if (error) {
+    //         return null
+    //     }
+
+    //     return userActivity as unknown as TUserActivity
+    // }
 }
 
 export const userRepo = new UserRepo()

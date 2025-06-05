@@ -59,6 +59,7 @@ export type TProblem = {
     }[];
     codeSnippet: Record<string, string>;
     referenceSolutions: Record<string, string>;
+    isContestProblem?: boolean;
 };
 
 
@@ -98,6 +99,7 @@ export type TProblemCreate = {
 
 export type TProblemId = {
     id: string
+
 }
 
 export type TGetProblems = {

@@ -4,17 +4,16 @@ import path from "node:path"
 import { globalErrorHandler, notFoundHandler } from "./configs"
 import cors, { CorsOptions } from "cors"
 import cookieParser from "cookie-parser"
-import { commentRouter, comunityRoute, executeRouter, playlistRoute, problemRouter, submissionRouter, userRouter } from "./routes"
+import { commentRouter, comunityRoute, contestRouter, executeRouter, playlistRoute, problemRouter, submissionRouter, userRouter } from "./routes"
 import passport from "passport"
 import session from "express-session";
 import { myEnvironment } from "@/configs"
+
 const app = express()
 
 const corsOptions: CorsOptions = {
     origin: ["http://localhost:3000", "https://labs.traken.in"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
 }
 app.use(cors(corsOptions))
 
@@ -39,6 +38,7 @@ app.get("/", (_request: AppRequest, response: AppResponse) => {
     response.status(200).json({ message: "server is running !!" })
 })
 
+
 //routes
 
 app.use("/api/v1/users", userRouter)
@@ -48,6 +48,7 @@ app.use("/api/v1/submissions", submissionRouter)
 app.use("/api/v1/playlists", playlistRoute)
 app.use("/api/v1/comunities", comunityRoute)
 app.use("/api/v1/comments", commentRouter)
+app.use("/api/v1/contests", contestRouter)
 
 
 // 404

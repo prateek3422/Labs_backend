@@ -25,19 +25,25 @@ enum ProblemDifficulty {
   HARD
 }
 
+enum ContestStatus {
+  UPCOMING
+  LIVE
+  ENDED
+}
+
 model Users {
-  id             String                 @id @default(uuid()) @db.Uuid
-  name           String                 @db.VarChar(191)
-  email          String                 @unique
+  id             String            @id @default(uuid()) @db.Uuid
+  name           String            @db.VarChar(191)
+  email          String            @unique
   image          Json?
-  role           UserRole               @default(USER)
+  role           UserRole          @default(USER)
   password       String
-  LoginType      String                 @default("email")
-  refreshToken   String                 @default("")
-  otp            String                 @default("")
-  isVerified     Boolean                @default(false)
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  LoginType      String            @default("email")
+  refreshToken   String            @default("")
+  otp            String            @default("")
+  isVerified     Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
   problems       Problems[]
   submissions    Submissions[]
   solvedProblems ProblemSolved[]
@@ -46,8 +52,7 @@ model Users {
   comunity       Comunity[]
   Commentby      ComunityComment[]
   upvote         ComunityUpvote[]
-  contests       ContestParticipation[]
-  leaderBoard    LeaderBoard[]
+  contests       Contest[]
 
   @@index([email])
 }
@@ -69,13 +74,13 @@ model Problems {
   referenceSolutions Json
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+  activity           UserActivity[]
 
   //RELATIONSHIPS
   user             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
   submissions      Submissions[]
   solvedBy         ProblemSolved[]
   problemPlaylists problemInPlaylist[]
-  userActivity     UserActivity[]
 }
 
 model Submissions {
@@ -122,15 +127,15 @@ model TestCases {
 }
 
 model ProblemSolved {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  problemId String   @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id           String         @id @default(uuid()) @db.Uuid
+  userId       String         @db.Uuid
+  problemId    String         @db.Uuid
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  userActivity UserActivity[]
   //RELATIONSHIPS
-  user    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user         Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem      Problems       @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
 }
@@ -165,15 +170,18 @@ model problemInPlaylist {
 model UserActivity {
   id              String   @id @default(uuid()) @db.Uuid
   userId          String   @db.Uuid
-  problemsolvedId String[] @db.Uuid
+  problemId       String   @db.Uuid
+  problemSolvedId String?  @db.Uuid
+  streakCount     Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   //RELATIONSHIPS
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem       Problems       @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problemSolved ProblemSolved? @relation(fields: [problemSolvedId], references: [id], onDelete: SetNull)
 
-  Problems   Problems? @relation(fields: [problemsId], references: [id])
-  problemsId String?   @db.Uuid
+  @@unique([userId, problemId]) // Changed from just [userId] to allow multiple activities per user
 }
 
 model Comunity {
@@ -219,46 +227,27 @@ model ComunityUpvote {
 }
 
 model Contest {
-  id           String                 @id @default(uuid()) @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   name         String
   description  String?
-  problemIds   String[]               @db.Uuid
-  startTime    DateTime
-  isActive     Boolean                @default(true)
-  endTime      DateTime
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
-  participants ContestParticipation[]
-  leaderBoard  LeaderBoard[]
+  problemIds   String[]      @db.Uuid
+  startTime    String
+  endTime      String
+  status       ContestStatus @default(UPCOMING)
+  duration     Int           @default(90)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  participants Users[]
 }
 
-model ContestParticipation {
+model Score {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
   contestId String   @db.Uuid
   score     Int      @default(0)
-  isWinner   Boolean @default(false)
-  isDisqualified Boolean @default(false)
+  timeTaken DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //RELATIONSHIPS
-  user    Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, contestId])
-}
-
-model LeaderBoard {
-  id        String   @id @default(uuid()) @db.Uuid
-  contestId String   @db.Uuid
-  users     Users[]
-  score     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  //RELATIONSHIPS
-  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
-
-  @@unique([contestId])
+  @@unique([userId, contestId]) // Ensure unique score per user in a contest
 }

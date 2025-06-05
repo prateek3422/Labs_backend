@@ -1,4 +1,5 @@
 import { userRepo } from "@/repositories";
+// import { problemRepo } from "@/repositories/queries/problem";
 import { deleteImage, uploadImage } from "@/utils";
 
 // Define proper types for file uploads
@@ -83,6 +84,49 @@ class ProfileService {
             }
         };
     }
+
+    // async createUserActivity(userId: string) {
+    //     const user = await userRepo.getUser(userId);
+
+    //     const problemsolvedId = await problemRepo.getAllProblemsSolvedByUser(userId);
+
+    //     if (!problemsolvedId) {
+    //         return {
+    //             statusCode: 404,
+    //             error: "No problems solved by user"
+    //         };
+    //     }
+
+    //     if (!user) {
+    //         return {
+    //             statusCode: 404,
+    //             error: "User not found"
+    //         };
+    //     }
+
+
+
+    //     const date = new Date();
+    //     // const currentDate = date.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
+
+    //     // const userActivity = await userRepo.createUserActivity({
+    //     //     userId: user.id,
+    //     //     problemsolvedId: problemsolvedId.map(problem => problem.id)
+    //     // });
+
+    //     // if (!userActivity) {
+    //     //     return {
+    //     //         statusCode: 500,
+    //     //         error: "Failed to create user activity"
+    //     //     };
+    //     // }
+    //     // return {
+    //     //     statusCode: 201,
+    //     //     message: "User activity created successfully",
+    //     //     data: userActivity
+    //     // };
+
+    // }
 }
 
 export const profileService = new ProfileService();

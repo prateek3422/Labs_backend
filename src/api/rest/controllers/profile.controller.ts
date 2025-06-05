@@ -3,7 +3,7 @@ import { HttpError } from "../configs";
 import { profileService } from "@/services/profile.service";
 
 class ProfileController {
-    uploadProfilePicture = async (request: AppRequest, response:AppResponse, next:AppNextFunction) =>{
+    uploadProfilePicture = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const files = request.file as Express.Multer.File;
 
         if (!files) {
@@ -16,14 +16,38 @@ class ProfileController {
         }
 
         //@ts-expect-error       if (!files || !files.image || !Array.isArray(files.image) || files.image.length === 0) 
-        const result = await profileService.uploadProfilePicture({ files, userId});
+        const result = await profileService.uploadProfilePicture({ files, userId });
 
         return result.statusCode === 200 ? response.status(result.statusCode).json({
-                statusCode: result.statusCode,
-                message: result.message,
-                data: result.data
-            }) : next(new HttpError(result.error || "Something went wrong while uploading profile picture", result.statusCode));
+            statusCode: result.statusCode,
+            message: result.message,
+            data: result.data
+        }) : next(new HttpError(result.error || "Something went wrong while uploading profile picture", result.statusCode));
     }
+
+
+    // userActivity = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+    //     const userId = request.user?.id;
+    //     if (!userId) {
+    //         return next(new HttpError("User not found", 404));
+    //     }
+
+    //     const result = await profileService.createUserActivity(userId);
+
+    //     if (result.statusCode === 201) {
+    //         return response.status(result.statusCode).json({
+    //             statusCode: result.statusCode,
+    //             message: result.message,
+    //             data: result.data
+    //         });
+
+    //     } {
+    //         return next(new HttpError(result.error || "Something went wrong while fetching user activity", result.statusCode));
+    //     }
+
+
+
+    // }
 }
 
 

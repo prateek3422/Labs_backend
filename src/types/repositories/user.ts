@@ -42,12 +42,19 @@ export type ISingleUser = {
     refreshToken?: string
 }
 
+export type TUserActivity = {
+    userId: string
+    problemsolved: string
+}
+
 export interface IUserRepo {
-    getUser(): Promise<null | TUser>
+    getUser(id:string): Promise<null | TUser>
     getSingleUser(data: ISingleUser): Promise<null | TUser>
     getUsers(): Promise<[] | TUser[]>
     createUser(data: IcreateUser): Promise<null | TUser>
     verifyUser(data: IcreateUser): Promise<null | IVerifyUser>
     updateUserPassword(data: IUpateUserPassword): Promise<null | TUser>
     updateUser(data: TUser): Promise<null | TUser>
+    // getUserActivity(userId: string): Promise<null | TUserActivity>
+    createUserActivity(data:TUserActivity): Promise<null | TUser>
 }

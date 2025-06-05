@@ -7,6 +7,7 @@ export const AdminMiddleware = (
     next: AppNextFunction
 )=>{
     const user = request.user
+    
 
   if (!user) {
       return next(new Error("unauthorized | user not found"))

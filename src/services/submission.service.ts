@@ -1,4 +1,7 @@
+
 import { executeRepo } from "@/repositories/queries/execute";
+import { problemRepo } from "@/repositories/queries/problem";
+import { scoreRepo } from "@/repositories/queries/score";
 import { TExecute } from "@/types/repositories";
 import { getLanguage, pollBatchResults, SubmissionResponse, submitBatch } from "@/utils/judge0";
 
@@ -33,6 +36,7 @@ class SubmissionService {
 
         const result = await pollBatchResults(token)
 
+ 
         //* analyze test cases
         let allPassed = true;
 
@@ -73,7 +77,7 @@ class SubmissionService {
             memory: detailedResults.some((result) => result.memory) ? JSON.stringify(detailedResults.map((result) => result.memory)) : "",
         })
 
-       
+
 
         if (!SavedSubmission) {
             return {
@@ -82,14 +86,57 @@ class SubmissionService {
                 data: null
             }
         }
-
-
-
+    
         if (allPassed) {
-            await executeRepo.solvedProblem({
+            const solved = await executeRepo.solvedProblem({
                 userId: data.userId,
                 problemId: data.problemId
             })
+
+            // console.log(solved, "solved problem")
+
+            if (!solved) {
+                return {
+                    statusCode: 500,
+                    error: "Failed to save solved problem",
+                    data: null
+                }
+            }
+
+            // const userActivity = await userRepo.createUserActivity({
+            //     userId: data.userId,
+            //     problemsolvedId: solved?.id
+            // })
+
+            // console.log(userActivity, "user activity")
+
+            const problem = await problemRepo.getProblemById({ id: data.problemId })
+
+
+            if (problem?.isContestProblem) {
+                const score = await scoreRepo.createScore({
+                    userId: data.userId,
+                    timeTaken: detailedResults.some((result) => result.time)
+                        ? detailedResults
+                            .map((result) => Number.parseFloat(result.time || "0"))
+                            .reduce((a, b) => a + b, 0)
+                        : 0,
+                    score: 10, 
+                    contestId: data?.contestId || ""
+                }
+
+                )
+
+                if (!score) {
+                    return {
+                        statusCode: 500,
+                        error: "Failed to save score",
+                        data: null
+                    }
+                }
+
+            }
+
         }
 
         const testCasesResults = detailedResults.map((result) => ({
@@ -104,7 +151,7 @@ class SubmissionService {
             memory: result.memory,
             time: result.time
         }))
-        
+
         // @ts-expect-error does not exist on type 'PrismaClient'
         const savedTestCases = await executeRepo.testCases(testCasesResults)
 
@@ -130,8 +177,8 @@ class SubmissionService {
 
     }
 
-    async getAllSubmissionsService (userId: string) {
-        const submissions = await executeRepo.getAllSubmissions({userId})
+    async getAllSubmissionsService(userId: string) {
+        const submissions = await executeRepo.getAllSubmissions({ userId })
 
         if (!submissions) {
             return {
@@ -149,8 +196,8 @@ class SubmissionService {
 
     }
 
-    async getSubmissionByProblemIdService (userId: string, problemId: string) {
-        const submission = await executeRepo.getSubmissionByProblemId({userId, problemId})
+    async getSubmissionByProblemIdService(userId: string, problemId: string) {
+        const submission = await executeRepo.getSubmissionByProblemId({ userId, problemId })
 
         if (!submission) {
             return {
@@ -167,7 +214,7 @@ class SubmissionService {
         }
     }
 
-    async getSubmissionCountService (problemId: string) {
+    async getSubmissionCountService(problemId: string) {
         const submissionCount = await executeRepo.getSubmissionCount(problemId)
 
         if (!submissionCount) {
@@ -183,7 +230,25 @@ class SubmissionService {
             message: "Submissions fetched successfully",
             data: submissionCount
         }
-    }   
+    }
+
+    getSolvedProblemService = async (userId: string, problemId: string) => {
+        const solvedProblem = await executeRepo.getSolvedProblem({ userId, problemId })
+
+        if (!solvedProblem) {
+            return {
+                statusCode: 404,
+                error: "No solved problem found",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "Solved problem fetched successfully",
+            data: solvedProblem
+        }
+    }
 }
 
 export const submissionService = new SubmissionService();

@@ -1,11 +1,12 @@
 import { contestRepo } from "@/repositories/queries/contest";
+
 import { TContest } from "@/types/repositories/contest";
 
 class ContestService {
-    async createcontest(data:TContest ) {
+    async createcontest(data: TContest) {
         const contest = await contestRepo.createContest(data);
 
-        if(!contest) {
+        if (!contest) {
             return {
                 statusCode: 500,
                 error: "contest creation failed",
@@ -23,10 +24,10 @@ class ContestService {
 
     }
 
-    async getContest(){
+    async getContest() {
         const contests = await contestRepo.getContest();
 
-        if(!contests) {
+        if (!contests) {
             return {
                 statusCode: 500,
                 error: "failed to fetch contests",
@@ -44,7 +45,8 @@ class ContestService {
     async getContestById(id: string) {
         const contest = await contestRepo.getContestById(id);
 
-        if(!contest) {
+
+        if (!contest) {
             return {
                 statusCode: 404,
                 error: "contest not found",
@@ -62,7 +64,7 @@ class ContestService {
     async deleteContest(id: string) {
         const contest = await contestRepo.getContestById(id);
 
-        if(!contest) {
+        if (!contest) {
             return {
                 statusCode: 404,
                 error: "contest not found",
@@ -72,7 +74,7 @@ class ContestService {
 
         const deletedContest = await contestRepo.deleteContest(id);
 
-        if(!deletedContest) {
+        if (!deletedContest) {
             return {
                 statusCode: 500,
                 error: "failed to delete contest",
@@ -90,7 +92,7 @@ class ContestService {
     async updateContest(id: string, data: Partial<TContest>) {
         const contest = await contestRepo.getContestById(id);
 
-        if(!contest) {
+        if (!contest) {
             return {
                 statusCode: 404,
                 error: "contest not found",
@@ -100,7 +102,7 @@ class ContestService {
 
         const updateCOntest = await contestRepo.updateContest(id, data);
 
-        if(!updateCOntest) {
+        if (!updateCOntest) {
             return {
                 statusCode: 500,
                 error: "failed to update contest",
@@ -114,29 +116,11 @@ class ContestService {
             data: updateCOntest
         }
     }
+    async joinContest(data: { contestId: string; userId: string }) {
 
-    async getActiveContests() {
-        const contests = await contestRepo.getActiveContests();
-
-        if(!contests) {
-            return {
-                statusCode: 500,
-                error: "failed to fetch active contests",
-                data: null
-            }
-        }
-
-        return {
-            statusCode: 200,
-            message: "active contests fetched successfully",
-            data: contests
-        }
-    }
-
-    async toggleContestStatus(id: string) {
-        const contest = await contestRepo.toggleContestStatus(id);
-
-        if(!contest) {
+        const contest = await this.getContestById(data.contestId);
+        
+        if (!contest) {
             return {
                 statusCode: 404,
                 error: "contest not found",
@@ -144,13 +128,76 @@ class ContestService {
             }
         }
 
-        return {
-            statusCode: 200,
-            message: `contest ${contest.isActive ? "activated" : "deactivated"} successfully`,
-            data: contest
+        if(contest?.data?.status !== "UPCOMING") {
+            return {
+                statusCode: 400,
+                error: "this contest is not open for joining",
+                data: null
+            }
         }
 
+        //Already joined contest
+        const existingJoin =  contest.data?.participants?.find(participant => participant.id === data.userId);
+
+        if (existingJoin) {
+            return {
+                statusCode: 400,
+                error: "you have already joined this contest",
+                data: null
+            }
+        }
+        const joinedContest = await contestRepo.joinContest(data);
+
+        if (!joinedContest) {
+            return {
+                statusCode: 500,
+                error: "failed to join contest",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "contest joined successfully",
+            data: joinedContest
+        }
     }
+    // async getActiveContests() {
+    //     const contests = await contestRepo.getActiveContests();
+
+    //     if(!contests) {
+    //         return {
+    //             statusCode: 500,
+    //             error: "failed to fetch active contests",
+    //             data: null
+    //         }
+    //     }
+
+    //     return {
+    //         statusCode: 200,
+    //         message: "active contests fetched successfully",
+    //         data: contests
+    //     }
+    // }
+
+    // async toggleContestStatus(id: string) {
+    //     const contest = await contestRepo.toggleContestStatus(id);
+
+    //     if(!contest) {
+    //         return {
+    //             statusCode: 404,
+    //             error: "contest not found",
+    //             data: null
+    //         }
+    //     }
+
+    //     return {
+    //         statusCode: 200,
+    //         message: `contest  successfully`,
+    //         data: contest
+    //     }
+
+    // }
 }
 
 

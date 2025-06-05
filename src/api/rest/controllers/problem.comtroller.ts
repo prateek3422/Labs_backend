@@ -10,7 +10,6 @@ class ProblemController {
         const { data, error } = createProblemValidation.safeParse(request.body)
 
         if (error) {
-     
             return next(new HttpError(error?.issues[0]?.message, 400))
         }
 

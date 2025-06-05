@@ -43,11 +43,11 @@ class UserController {
 
 
         if (result.statusCode === 301) {
-            response.status(result.statusCode).cookie("accessToken", result?.data?.AccessToken, {
+            response.status(result.statusCode).cookie("AccessToken", result?.data?.AccessToken, {
                 httpOnly: true,
                 sameSite: "none",
                 secure: true
-            }).cookie("refreshToken", result?.data?.RefreshToken, {
+            }).cookie("RefreshToken", result?.data?.RefreshToken, {
                 httpOnly: true,
                 sameSite: "none",
                 secure: true
@@ -125,12 +125,14 @@ class UserController {
                 .cookie("AccessToken", result?.data?.AccessToken, {
                     httpOnly: true,
                     sameSite: "none",
-                    secure: true
+                    secure: true,
+                    maxAge: 1 * 24 * 60 * 60 * 1000
                 })
                 .cookie("RefreshToken", result?.data?.RefreshToken, {
                     httpOnly: true,
                     sameSite: "none",
-                    secure: true
+                    secure: true,
+                    maxAge: 7 * 24 * 60 * 60 * 1000
                 })
                 .json({
                     statusCode: result.statusCode,
@@ -214,12 +216,14 @@ class UserController {
                 .cookie("AccessToken", result?.data?.AccessToken, {
                     httpOnly: true,
                     sameSite: myEnvironment.NODE_ENV === "development" ? "lax" : "none",
-                    secure: true
+                    secure: true,
+                    maxAge: 1 * 24 * 60 * 60 * 1000 // 1 day
                 })
                 .cookie("RefreshToken", result?.data?.RefreshToken, {
                     httpOnly: true,
                     sameSite: myEnvironment.NODE_ENV === "development" ? "lax" : "none",
                     secure: true
+                    , maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 })
                 .json({
                     statusCode: result.statusCode,
@@ -241,7 +245,13 @@ class UserController {
         const result = await userService.forgotPasswordService(data.email)
 
         if (result.statusCode === 200) {
-            response.status(result.statusCode).json({
+
+            response.status(result.statusCode).cookie("token", result?.data, {
+                httpOnly: true,
+                sameSite: myEnvironment.NODE_ENV === "development" ? "lax" : "none",
+                secure: true,
+                maxAge: 15 * 60 * 1000 // 15 minutes
+            }).json({
                 statusCode: result.statusCode,
                 mesaage: result.message,
                 data: result.data
@@ -281,6 +291,7 @@ class UserController {
         }
 
     }
+
 
 
 

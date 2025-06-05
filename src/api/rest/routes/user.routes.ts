@@ -21,6 +21,7 @@ router.patch("/resetpassword", AsyncErrorHandler(userController.resetPassword))
 router.post("/sendverificationemail", AsyncErrorHandler(userController.resendEmailVerify))
 router.patch("/ImageUpload", fileMiddleware.single("image"), authMiddleware, AsyncErrorHandler(profileController.uploadProfilePicture))
 router.post("/refresh", authMiddleware, AsyncErrorHandler(userController.refreshToken))
+// router.post("/activity", authMiddleware, AsyncErrorHandler(profileController.userActivity))
 
 // Type-safe passport authentication handlers
 const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] }) as RequestHandler;

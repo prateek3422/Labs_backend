@@ -39,12 +39,10 @@ class ProblemService {
 
             const submittionResult = await submitBatch(submission) as unknown as SubmissionResponse[];
 
-            // console.log(submittionResult, "tokens")
-
             const tokens: string[] = submittionResult.map((response: SubmissionResponse) => response.token)
 
             const results = await pollBatchResults(tokens) as JudgeResult[];
-            // console.log("result", results)     
+            
 
             for (const [index, result] of results.entries()) {
                 if (result.status.id !== 3) {

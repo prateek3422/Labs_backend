@@ -10,8 +10,6 @@ route.get("/", authMiddleware, AsyncErrorHandler(submissionController.getAllSubm
 route.post("/submit", authMiddleware, AsyncErrorHandler(submissionController.createSubmission) )
 route.get ("/getSubmission/:problemId", authMiddleware, AsyncErrorHandler(submissionController.getSubmissionByproblemId) )
 route.get ("/getSubmissionCount/:problemId", authMiddleware, AsyncErrorHandler(submissionController.getSubmissionCount) )
-
-
-
+route.get("/getSolvedProblem/:problemId", authMiddleware, AsyncErrorHandler(submissionController.getSolvedProblem) )
 
 export { route as submissionRouter }

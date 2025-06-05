@@ -2,16 +2,25 @@ import { AppNextFunction, AppRequest, AppResponse } from "@/types";
 import { createContestValidation } from "../validation";
 import { HttpError } from "../configs";
 import { contestService } from "@/services/contest.service";
+import { StartCron } from "@/utils";
 
 class ContestController {
     createContest = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { data, error } = createContestValidation.safeParse(request.body);
+
 
         if (error) {
             return next(new HttpError(error.issues[0].message, 400));
         }
 
         const result = await contestService.createcontest(data);
+
+        if (result.statusCode === 201 && result.data) {
+            StartCron({
+                contestId: result.data.id!,
+                startTime: new Date(result.data.startTime.toString()),
+            })
+        }
 
         return result.statusCode === 201
             ? response.status(result.statusCode).json({
@@ -23,7 +32,6 @@ class ContestController {
     }
 
     getContest = async (_request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-
         const result = await contestService.getContest();
 
         return result.statusCode === 200
@@ -36,8 +44,9 @@ class ContestController {
     }
 
     getContestById = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const { id } = request.params;
+        const { id } = request.params
 
+  
         if (!id) {
             return next(new HttpError("Contest ID is required", 400));
         }
@@ -94,26 +103,15 @@ class ContestController {
             : next(new HttpError(result.error || "Something went wrong while updating contest", result.statusCode));
     }
 
-    getActiveContests = async (_request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const result = await contestService.getActiveContests();
-
-        return result.statusCode === 200
-            ? response.status(result.statusCode).json({
-                statusCode: result.statusCode,
-                message: result.message,
-                data: result.data
-            })
-            : next(new HttpError(result.error || "Something went wrong while fetching active contests", result.statusCode));
-    }
-
-    toggleContestStatus = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+    JoinContest = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { id } = request.params;
+        const userId = request.user?.id as string
 
         if (!id) {
             return next(new HttpError("Contest ID is required", 400));
         }
 
-        const result = await contestService.toggleContestStatus(id);
+        const result = await contestService.joinContest({ contestId: id, userId });
 
         return result.statusCode === 200
             ? response.status(result.statusCode).json({
@@ -121,7 +119,7 @@ class ContestController {
                 message: result.message,
                 data: result.data
             })
-            : next(new HttpError(result.error || "Something went wrong while toggling contest status", result.statusCode));
+            : next(new HttpError(result.error || "Something went wrong while joining contest", result.statusCode));
     }
 }
 

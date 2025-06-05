@@ -12,20 +12,24 @@ export type TSubmission = {
     time: string;
     memory: string;
     compileOutput: string;
+
 }
 
 export type TSolvedProblem = {
+    id?: string[] | undefined;
     userId: string;
     problemId: string;
 }
 
 export type TExecute = {
+    contestId?: string;
     source_code:string | Record<string, string>;
     language_id: number;
     stdin: string[];
     expected_output: string[];
     problemId: string;
     userId: string;
+
 }
 
 
@@ -56,4 +60,5 @@ export interface IExportRepo {
     getAllSubmissions(data: TUserId): Promise<null | TSubmission[]>
     getSubmissionByProblemId(data: TUserId): Promise<null | TSubmission[]>
     getSubmissionCount(problemId: string): Promise<null | number>
+    getSolvedProblem(data: TUserId): Promise<null | TSolvedProblem[]>
 }

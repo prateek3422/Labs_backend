@@ -79,17 +79,25 @@ class UserService {
             }
         }
 
-        const AccessToken = tokenUtilities.sign({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }, myEnvironment.ACCESS_TOKEN, myEnvironment.ACCESS_TOKEN_EXPAIRY)
-        const RefreshToken = tokenUtilities.sign({
-            id: user.id,
-            email: user.email
-        }, myEnvironment.REFRESH_TOKEN, myEnvironment.REFRESH_TOKEN_EXPAIRY)
+        const AccessToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            myEnvironment.ACCESS_TOKEN,
+            myEnvironment.ACCESS_TOKEN_EXPAIRY
+        )
 
+        const RefreshToken = tokenUtilities.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            myEnvironment.REFRESH_TOKEN,
+            myEnvironment.REFRESH_TOKEN_EXPAIRY
+        )
 
        
         return {

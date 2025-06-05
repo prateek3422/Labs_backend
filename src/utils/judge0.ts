@@ -5,7 +5,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface JudgeSubmission {
 
-  source_code: Record<string,string> | string
+  source_code: Record<string, string> | string
   language_id: number;
   stdin: string;
   expected_output?: string;
@@ -50,7 +50,7 @@ export const getJudge0Languages = (language: string): number | undefined => {
   return languageMap[language.toUpperCase()];
 }
 
-export const getLanguage = (language_id : number) => {
+export const getLanguage = (language_id: number) => {
   const languageMap: Record<number, string> = {
     71: "PYTHON",
     50: "C",
@@ -65,16 +65,18 @@ export const getLanguage = (language_id : number) => {
 }
 
 export const submitBatch = async (submissions: JudgeSubmission[]) => {
+
   try {
     const response = await axios.post<BatchSubmissionResponse>(
       `${myEnvironment.JUDGE0_API}/submissions/batch?base64_encoded=false`,
       { submissions }
     );
-    // console.log("Batch submission successful. Response:", response);
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      logger.error("Axios Error:", error.response?.data || error.message);
+
+      logger.error("Axios Error:", error || error);
     } else {
       logger.error("Unexpected Error:", error);
     }
@@ -94,6 +96,8 @@ export const pollBatchResults = async (tokens: string[]): Promise<JudgeResult[]>
         }
       }
     );
+
+
 
     const results: JudgeResult[] = response.data.submissions;
     const isAllDone = results.every((r) => r.status.id !== 1 && r.status.id !== 2);

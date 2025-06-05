@@ -93,6 +93,29 @@ class SubmissionController {
             return next(new HttpError(result.error || "something went wrong", result.statusCode))
         }
     }
+
+    getSolvedProblem = async (request:AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const userId = request.user?.id
+        const problemId = request.params.problemId
+
+        if (!userId) {
+            return next(new HttpError("User not found", 404))
+        }
+
+        if (!problemId) {
+            return next(new HttpError("Problem id not found", 404))
+        }
+        const result = await submissionService.getSolvedProblemService(userId, problemId);
+
+        if(result.statusCode === 200){
+            response.status(result.statusCode).json({
+                message: result.message,
+                data: result.data
+            })
+        }else{
+            return next(new HttpError(result.error || "something went wrong", result.statusCode))
+        }
+    }
 }
 
 

@@ -9,7 +9,7 @@ const _environment = {
     TOKEN: process.env.TOKEN || "JDkskjkjashsashda",
     TOKEN_EXPAIRY: process.env.TOKEN_EXPAIRY || "10m",
     REFRESH_TOKEN: process.env.REFRESH_TOKEN || "askljkjsakldjjmkjqojiosaks",
-    REFRESH_TOKEN_EXPAIRY: process.env.REFRESH_TOKEN_EXPAIRY || "10D",
+    REFRESH_TOKEN_EXPAIRY: process.env.REFRESH_TOKEN_EXPAIRY || "10d",
     ACCESS_TOKEN: process.env.ACCESS_TOKEN || "kasajkahsahsjahjsab",
     ACCESS_TOKEN_EXPAIRY: process.env.ACCESS_TOKEN_EXPAIRY || "60m",
     JUDGE0_API: process.env.JUDGE_API_URL || "http://localhost:2358",
