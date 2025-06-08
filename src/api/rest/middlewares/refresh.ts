@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 
 import { AppNextFunction, AppRequest, AppResponse } from "@/types";
 import { HttpError } from "../configs";
@@ -12,8 +11,9 @@ export const RefreshMiddleware = (
     next: AppNextFunction
 ) => {
  
-    const token =
-        request.headers.authorization?.split(" ")[1] || request?.cookies?.RefreshToken;
+    const token: string | undefined =
+        (typeof request.headers.authorization === "string" ? request.headers.authorization.split(" ")[1] : undefined) ||
+        (typeof request?.cookies?.RefreshToken === "string" ? request.cookies.RefreshToken : undefined);
 
     if (!token) {
         return next(new HttpError("unauthorized | token not found", 401));

@@ -5,10 +5,12 @@ import { myEnvironment } from "@/configs"
 
 export const TokenMiddleWare = (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
 
-        const token = request.header?.("authorization")?.split(" ")[1] || request?.cookies?.token
+        const authHeader = request.header?.("authorization")
+        const cookieToken = request?.cookies?.token as string | undefined
+        const token = authHeader?.split(" ")[1] || cookieToken
 
         if (!token) {
-            next(new HttpError("unauthorized | token not found", 401))
+            return next(new HttpError("unauthorized | token not found", 401))
         }
 
         const decodedToken = tokenUtilities.verify(token, myEnvironment.TOKEN)

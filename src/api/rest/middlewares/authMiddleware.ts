@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { AppNextFunction, AppRequest, AppResponse } from "@/types"
 
 import { HttpError } from "../configs"
@@ -6,13 +6,15 @@ import { tokenUtilities } from "@/utils/tokenUtile"
 import { myEnvironment } from "@/configs"
 
 export const authMiddleware =  (request: AppRequest, _response: AppResponse, next: AppNextFunction) => {
-    const token = request.header("authorization")?.split(" ")[1] || request?.cookies?.AccessToken
+    const authHeader = request.header("authorization")
+    const cookieToken = request?.cookies?.AccessToken as string | undefined
+    const token = authHeader?.split(" ")[1] || cookieToken
 
     if (!token) {
-        next(new HttpError("unauthorized | token not found", 401))
+        return next(new HttpError("unauthorized | token not found", 401))
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+   
     const decodedToken = tokenUtilities.verify(token, myEnvironment.ACCESS_TOKEN)
 
     if (!decodedToken) {
