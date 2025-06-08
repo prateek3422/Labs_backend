@@ -7,7 +7,7 @@ class CommentService {
 
         if (!comment) {
             return {
-                statusCode: 500,
+                statusCode: 400,
                 error: "Comment not created",
             }
         }

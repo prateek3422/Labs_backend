@@ -23,7 +23,7 @@ class CommentController {
             comunityId: data.comunityId,
         });
 
-        return comment.statusCode === 200 ? response.status(comment.statusCode).json({
+        return comment.statusCode === 201 ? response.status(comment.statusCode).json({
                 message: comment.message,
                 data: comment.data
             }) : next(new HttpError(comment.error || "somthing went wrong on comment", comment.statusCode));
