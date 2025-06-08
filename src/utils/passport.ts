@@ -139,6 +139,7 @@ try {
         clientID: myEnvironment.GITHUB_CLIENT_ID,
         clientSecret: myEnvironment.GITHUB_CLIENT_SECRET,
         callbackURL: myEnvironment.GITHUB_CALLBACK_URL,
+        scope: ["user", "user:email"]
     },
         (
             accessToken: string,

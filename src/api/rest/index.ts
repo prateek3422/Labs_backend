@@ -1,7 +1,7 @@
 import { AppRequest, AppResponse } from "@/types"
 import express from "express"
 import path from "node:path"
-import { globalErrorHandler, notFoundHandler } from "./configs"
+import { globalErrorHandler, httpLogger, notFoundHandler } from "./configs"
 import cors, { CorsOptions } from "cors"
 import cookieParser from "cookie-parser"
 import { commentRouter, comunityRoute, contestRouter, executeRouter, playlistRoute, problemRouter, submissionRouter, userRouter } from "./routes"
@@ -25,6 +25,7 @@ app.use(session({
     saveUninitialized: true,
 }))
 
+app.use(httpLogger)
 app.use(passport.initialize())
 app.use(passport.session())
 

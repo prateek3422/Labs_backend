@@ -41,6 +41,7 @@
         "@types/passport": "^1.0.17",
         "@types/passport-github2": "^1.2.9",
         "@types/passport-google-oauth20": "^2.0.16",
+        "@types/useragent": "^2.3.4",
         "@typescript-eslint/eslint-plugin": "^8.31.0",
         "@typescript-eslint/parser": "^8.31.0",
         "eslint": "^9.25.1",
