@@ -33,8 +33,9 @@ class CommentRepo implements ICommentRepo {
                 },
                 
             },
+
             orderBy: {
-                [data.sort || "createdAt"]: data.sortBy || "desc"
+                [data.sort || "createdAt"]: data.sortBy || "asc"
             }
         }))
         if (error) {
