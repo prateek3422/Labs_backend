@@ -15,6 +15,7 @@ router.post("/verify", AsyncErrorHandler(TokenMiddleWare), AsyncErrorHandler(use
 router.post("/signin", AsyncErrorHandler(userController.loginUser))
 router.post("/signout", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.logOutUser))
 router.get("/getuser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.getuser))
+router.get("/getuser/:id",  AsyncErrorHandler(userController.getuserById))
 router.get("/getalluser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.getAllUser))
 router.patch("/updateuser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.refreshToken))
 router.patch("/forgotpassword", AsyncErrorHandler(userController.forgotPassword))

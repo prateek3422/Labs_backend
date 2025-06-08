@@ -184,6 +184,25 @@ class UserController {
         }
     }
 
+    getuserById = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const id = request.params.id
+
+        if (!id) {
+            return next(new HttpError("Email is required for logout", 400))
+        }
+
+        const result = await userService.getUserService(id)
+
+        if (result.statusCode === 200) {
+            response.status(result.statusCode).json({
+                statusCode: result.statusCode,
+                message: result.message,
+                data: result.data
+            })
+        } else {
+            return next(new HttpError(result.error || "something went wrong on user creating", result.statusCode))
+        }
+    }
     getAllUser = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const result = await userService.getAllUserService()
 

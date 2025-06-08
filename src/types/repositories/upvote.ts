@@ -1,31 +1,26 @@
 export type TUpvoteComunity = {
     userId: string;
     comunityId: string;
-    upvote: number;
+    isVote: boolean;
 }
 
 export type TDownvoteComunity = {
     userId: string;
     comunityId: string;
-    downvote: number;
+    downvote: boolean;
 }
 
 export type TUpvoteComment = {
+    comunityId: string;
     userId: string;
     commentId: string;
-    upvote: number;
+    isVote: boolean;
 }
-export type TDownvoteComment = {
-    userId: string;
-    commentId: string;
-    downvote: number;
-}
+
 
 export interface IUpvoteComunityRepo {
     toggleUpvoteComunity: (data: TUpvoteComunity) => Promise<null | TUpvoteComunity>
     getUpvoteComunity: (data: TUpvoteComunity) => Promise<null | TUpvoteComunity>
-    toggleDownvoteComunity: (data: TDownvoteComunity) => Promise<null | TDownvoteComunity>
     getCommentUpvote: (data: TUpvoteComment) => Promise<null | TUpvoteComment>
-    toggleUpvoteComment: (data: TUpvoteComment) => Promise<null | TUpvoteComment>
-    toggleDownvoteComment: (data: TDownvoteComment) => Promise<null | TDownvoteComment>
+    // toggleUpvoteComment: (data: TUpvoteComment) => Promise<null | TUpvoteComment>
 }
