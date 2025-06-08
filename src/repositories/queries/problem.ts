@@ -123,6 +123,20 @@ class ProblemRepo implements IProblemRepo {
 
         return problems as unknown as TProblem[]
     }
+    async updateProblemIsContestProblem (data: TProblemId ) {
+        const { data: updateProblem, error } = await asyncHandler(prisma.problems.update({
+            where: { id: data.id },
+            data: {
+                isContestProblem: data.isContestProblem
+            }
+        }));
+
+        if (error) {
+            return null;
+        }
+
+        return updateProblem as unknown as TProblem;
+    }
 }
 
 

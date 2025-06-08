@@ -249,6 +249,24 @@ class SubmissionService {
             data: solvedProblem
         }
     }
+
+    async getAllSubmissionService () {
+        const submissions = await executeRepo.getAllSubmission()
+
+        if (!submissions) {
+            return {
+                statusCode: 404,
+                error: "No submission found",
+                data: null
+            }
+        }
+
+        return {
+            statusCode: 200,
+            message: "Submissions fetched successfully",
+            data: submissions
+        }
+    }
 }
 
 export const submissionService = new SubmissionService();

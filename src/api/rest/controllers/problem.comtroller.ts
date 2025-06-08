@@ -10,6 +10,7 @@ class ProblemController {
         const { data, error } = createProblemValidation.safeParse(request.body)
 
         if (error) {
+            // console.log(error, "error in problem creation validation")
             return next(new HttpError(error?.issues[0]?.message, 400))
         }
 
@@ -33,7 +34,7 @@ class ProblemController {
     }
 
     getAllProblems = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const {page="1", limit="10", query, difficulty, tags, sortBy, sortOrder} = request.query
+        const {page="1", limit="50", query, difficulty, tags, sortBy, sortOrder} = request.query
         
         const result = await problemService.getAllProblemsService({
             page: Number(page),

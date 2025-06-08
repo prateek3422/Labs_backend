@@ -52,15 +52,11 @@ class CommentService {
         }
     }
 
-    async deleteComment (id: string) {
-        const comment = await commentRepo.deleteComment(id);
+    async deleteComment (data: {
+        commentId: string;
+    }) {
 
-        if (!comment) {
-            return {
-                statusCode: 500,
-                error: "Comment not deleted",
-            }
-        }
+     await commentRepo.deleteComment({ commentId: data.commentId });
 
         return {
             statusCode: 200,

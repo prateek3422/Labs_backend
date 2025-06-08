@@ -22,6 +22,8 @@ export interface ICommentRepo {
     createComment(data: TComment): Promise<null | TComment>;
     getAllComments(data: TGetComment): Promise<null | TComment[]>;
     updateComment(data: TUpdateComment): Promise<null | TUpdateComment>;
-    deleteComment(id: string): Promise<null>;
+    deleteComment(data:{
+        commentId: string;
+    }): Promise<null>;
 }
 

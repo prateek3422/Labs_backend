@@ -48,7 +48,7 @@ const createProblemValidation = z.object({
         }),
         JAVA: z.object({
             input: z.string().min(1, "Input is required"),
-            output: z.string().min(1, "Output is required"),
+            output: z.string().min(0, "Output is required"),
             explanation: z.string().optional(),
         }),
       }),
@@ -56,7 +56,7 @@ const createProblemValidation = z.object({
     constraints: z.string({ required_error: "Constraints are required" }).nonempty("At least one constraint is required"),
 
     testCases: z.array(testCaseSchema)
-        .min(1, { message: "At least one test case is required" })
+        .min(0, { message: "At least one test case is required" })
         .max(10, { message: "Maximum 10 test cases are allowed" }),
 
     codeSnippet: z.object({

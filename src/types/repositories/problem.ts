@@ -99,7 +99,7 @@ export type TProblemCreate = {
 
 export type TProblemId = {
     id: string
-
+    isContestProblem?: boolean
 }
 
 export type TGetProblems = {
@@ -120,5 +120,6 @@ export interface IProblemRepo {
     updateProblem(data: TProblem): Promise<null | TProblem>
     deleteProblem(data: TProblemId, id : TProblemId): Promise<null | TProblem>
     getAllProblemsSolvedByUser(userId: string ): Promise<null | TProblem[]>
+    updateProblemIsContestProblem(data: TProblemId): Promise<null | TProblem>
     
 }

@@ -8,7 +8,7 @@ const route = Router()
 route.post("/create", authMiddleware, AsyncErrorHandler(commentController.createComment))
 // route.get("/:comunityId", authMiddleware, AsyncErrorHandler(commentController.getCommentById))
 route.get("/", authMiddleware, AsyncErrorHandler(commentController.getAllComments))
-route.patch("/update/:comunityId", authMiddleware, AsyncErrorHandler(commentController.updateComment))
-route.delete("/delete/:comunityId", authMiddleware, AsyncErrorHandler(commentController.deleteComment))
+route.patch("/update", authMiddleware, AsyncErrorHandler(commentController.updateComment))
+route.delete("/delete", authMiddleware, AsyncErrorHandler(commentController.deleteComment))
 
 export { route as commentRouter }

@@ -31,6 +31,20 @@ class ComunityRepo implements IComunityRepo {
                 [data.sort || "createdAt"]: data.sortBy || "desc"
             },
 
+            include:{
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true
+                    }
+                },
+
+                upvotes: true,
+                comments: true
+            }
+
         }))
         if (error) {
             return null
@@ -42,6 +56,30 @@ class ComunityRepo implements IComunityRepo {
         const { data: comunity, error } = await asyncHandler(prisma.comunity.findUnique({
             where: {
                 id
+            },
+            include:{
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true
+                    }
+                },
+
+                upvotes: true,
+                comments: {
+                    include:{
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true
+                            }
+                        }
+                    }
+                }
             }
         }))
 

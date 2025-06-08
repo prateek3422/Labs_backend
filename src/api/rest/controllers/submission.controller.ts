@@ -116,6 +116,22 @@ class SubmissionController {
             return next(new HttpError(result.error || "something went wrong", result.statusCode))
         }
     }
+    getAllSub = async (request:AppRequest, response: AppResponse, next: AppNextFunction) => {
+        const userId = request.user?.id
+        if (!userId) {
+            return next(new HttpError("User not found", 404))
+        }
+        const result = await submissionService.getAllSubmissionService();
+
+        if(result.statusCode === 200){
+            response.status(result.statusCode).json({
+                message: result.message,
+                data: result.data
+            })
+        }else{
+            return next(new HttpError(result.error || "something went wrong", result.statusCode))
+        }
+    }
 }
 
 

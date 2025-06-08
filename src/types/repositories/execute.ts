@@ -61,4 +61,5 @@ export interface IExportRepo {
     getSubmissionByProblemId(data: TUserId): Promise<null | TSubmission[]>
     getSubmissionCount(problemId: string): Promise<null | number>
     getSolvedProblem(data: TUserId): Promise<null | TSolvedProblem[]>
+    getAllSubmission(): Promise<null | TSubmission[]>
 }

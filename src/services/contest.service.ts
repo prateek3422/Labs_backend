@@ -1,10 +1,19 @@
+import { logger } from "@/configs";
 import { contestRepo } from "@/repositories/queries/contest";
+import { problemRepo } from "@/repositories/queries/problem";
 
 import { TContest } from "@/types/repositories/contest";
 
 class ContestService {
     async createcontest(data: TContest) {
         const contest = await contestRepo.createContest(data);
+        if (data.problemIds && !Array.isArray(data.problemIds)) {
+            return {
+                statusCode: 400,
+                error: "problemIds must be an array",
+                data: null
+            };
+        }
 
         if (!contest) {
             return {
@@ -15,6 +24,30 @@ class ContestService {
         }
 
 
+        //!get problem by id and update isContest to true
+        if (data.problemIds && data.problemIds.length > 0) {
+            try {
+                // Use Promise.all to wait for all problem updates
+                const problemUpdatePromises = data.problemIds.map(async (problemId) => {
+                    return problemRepo.updateProblemIsContestProblem({
+                        id: problemId,
+                        isContestProblem: true
+                    });
+                });
+
+                const problemUpdates = await Promise.all(problemUpdatePromises);
+
+                // Check if any updates failed
+                const failedUpdates = problemUpdates.filter(update => !update);
+                if (failedUpdates.length > 0) {
+                    logger.warn(`Failed to update ${failedUpdates.length} problems for contest ${contest.id}`);
+                }
+            } catch (error) {
+                logger.error("Error updating problems for contest:", error);
+                // Continue execution but log the error
+            }
+        }
+   
         return {
             statusCode: 201,
             message: "contest created successfully",
@@ -119,7 +152,7 @@ class ContestService {
     async joinContest(data: { contestId: string; userId: string }) {
 
         const contest = await this.getContestById(data.contestId);
-        
+
         if (!contest) {
             return {
                 statusCode: 404,
@@ -128,7 +161,7 @@ class ContestService {
             }
         }
 
-        if(contest?.data?.status !== "UPCOMING") {
+        if (contest?.data?.status !== "UPCOMING") {
             return {
                 statusCode: 400,
                 error: "this contest is not open for joining",
@@ -137,7 +170,7 @@ class ContestService {
         }
 
         //Already joined contest
-        const existingJoin =  contest.data?.participants?.find(participant => participant.id === data.userId);
+        const existingJoin = contest.data?.participants?.find(participant => participant.id === data.userId);
 
         if (existingJoin) {
             return {

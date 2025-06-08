@@ -6,6 +6,7 @@ import { generateOtp } from "@/utils"
 import { hashUtilities } from "@/utils/hash"
 import { tokenUtilities } from "@/utils/tokenUtile"
 
+
 class UserService {
     createUserService = async (data: IcreateUser) => {
         //* check if user exist or not
@@ -314,7 +315,8 @@ class UserService {
     }
 
     getUserService = async (id: string) => {
-        const user = await userRepo.getSingleUser({ id })
+        const user = await userRepo.getUser( id )
+
 
         if (!user) {
             return {
@@ -327,14 +329,7 @@ class UserService {
         return {
             statusCode: 200,
             message: "user found successfully",
-            data: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                verified: user.isVerified,
-                image: user.image,
-            }
+            data:user
         }
     }
 
@@ -364,8 +359,8 @@ class UserService {
     }
 
 
-    refreshTokenService = async (token: string) => {
-        const user = await userRepo.getSingleUser({ refreshToken: token })
+    refreshTokenService = async (email: string) => {
+        const user = await userRepo.getSingleUser({ email: email })
         if (!user) {
             return {
                 statusCode: 400,
@@ -373,17 +368,6 @@ class UserService {
                 data: null
             }
         }
-
-        const decoded = tokenUtilities.verify(token, myEnvironment.REFRESH_TOKEN)
-
-        if (!decoded) {
-            return {
-                statusCode: 400,
-                error: "Invalid token",
-                data: null
-            }
-        }
-
         const newAccessToken = tokenUtilities.sign(
             {
                 id: user.id,

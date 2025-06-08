@@ -56,10 +56,12 @@ class CommentRepo implements ICommentRepo {
         return comment as unknown as TUpdateComment
     }
 
-    async deleteComment(id: string) {
+    async deleteComment(data: {
+        commentId: string;
+    }) {
         const { error } = await asyncHandler(prisma.comunityComment.delete({
             where: {
-                id
+                id: data.commentId
             }
         }))
         if (error) {

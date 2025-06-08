@@ -54,8 +54,8 @@ class PlaylistRepo implements IPlaylistRepo {
     }
 
     async deletePlaylist(playlistId: string) {
-        const {data:playlist,error} = await asyncHandler(prisma.playlist.delete({
-            where:{
+        const { data: playlist, error } = await asyncHandler(prisma.playlist.delete({
+            where: {
                 id: playlistId
             }
         }))
@@ -66,7 +66,7 @@ class PlaylistRepo implements IPlaylistRepo {
         return playlist as TPlaylist
     }
 
-    async addProblemToPlaylist({playlistId,problemId}: TPlaylistId) {
+    async addProblemToPlaylist({ playlistId, problemId }: TPlaylistId) {
         const { data: playlist, error } = await asyncHandler(prisma.problemInPlaylist.createMany({
             data: problemId.map((problemId) => ({
                 problemId,
@@ -81,11 +81,12 @@ class PlaylistRepo implements IPlaylistRepo {
     }
 
     async removeProblemFromPlaylist(data: TPlaylistId) {
+
         const { data: playlist, error } = await asyncHandler(prisma.problemInPlaylist.deleteMany({
 
-            where:{
+            where: {
                 playlistId: data.playlistId,
-                problemId:{
+                problemId: {
                     in: data.problemId
                 }
             }

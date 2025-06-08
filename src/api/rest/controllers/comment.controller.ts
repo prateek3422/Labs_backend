@@ -1,5 +1,5 @@
 import { AppNextFunction, AppRequest, AppResponse } from "@/types"
-import { createCommentValidation } from "../validation"
+import { createCommentValidation, deleteCommentValidation, updateCommentValidation } from "../validation"
 import { HttpError } from "../configs";
 import { commentService } from "@/services/comment.service";
 
@@ -7,11 +7,6 @@ import { commentService } from "@/services/comment.service";
 class CommentController {
     createComment = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { data, error } = createCommentValidation.safeParse(request.body);
-        const { comunityId } = request.params
-        if (!comunityId) {
-            return next(new HttpError("Comunity not found", 404));
-        }
-
         if (error) {
             return next(new HttpError(error.issues[0].message, 400));
         }
@@ -25,7 +20,7 @@ class CommentController {
         const comment = await commentService.createComment({
             comment: data.comment,
             userId,
-            comunityId,
+            comunityId: data.comunityId,
         });
 
         return comment.statusCode === 200 ? response.status(comment.statusCode).json({
@@ -52,15 +47,15 @@ class CommentController {
     }
 
     updateComment = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const { id } = request.params
-        const { data, error } = createCommentValidation.safeParse(request.body);
+        
+        const { data, error } = updateCommentValidation.safeParse(request.body);
 
         if (error) {
             return next(new HttpError(error.issues[0].message, 400));
         }
 
         const comment = await commentService.updateComment({
-            id,
+            id: data.commentId,
             comment: data.comment,
         });
 
@@ -71,14 +66,18 @@ class CommentController {
     }
 
     deleteComment = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
-        const { id } = request.params
+        const { data, error } = deleteCommentValidation.safeParse(request.body);
 
-        const comment = await commentService.deleteComment(id);
+        if (error) {
+            return next(new HttpError(error.issues[0].message, 400));
+        }
+
+        const comment = await commentService.deleteComment(data);
 
         return comment.statusCode === 200 ? response.status(comment.statusCode).json({
                 message: comment.message,
                 data: comment.data
-            }) : next(new HttpError(comment.error || "somthing went wrong on comment", comment.statusCode));
+            }) : next(new HttpError( "somthing went wrong on comment", comment.statusCode));
     }
 
 }

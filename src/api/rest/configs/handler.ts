@@ -2,6 +2,7 @@ import { AppErrorRequestHandler, AppNextFunction, AppRequest, AppResponse } from
 import { HttpError } from "./httpError"
 import { myEnvironment } from "@/configs"
 import { ZodError } from "zod"
+import { JsonWebTokenError } from "jsonwebtoken"
 
 //Type for async handler
 type AsyncHandler = (request: AppRequest, response: AppResponse, next: AppNextFunction) => Promise<unknown>
@@ -46,8 +47,11 @@ export const globalErrorHandler: AppErrorRequestHandler = (
         statusCode = 401
         message = `Unauthorized | ${error.name === "TokenExpiredError" ? "Token expired" : "Invalid token"}`
     }
-    
 
+    if(error instanceof JsonWebTokenError ){
+        statusCode = 401
+        message = `Unauthorized | Invalid token`  
+    }
     const responseBody = {
         statusCode,
         status: statusCode >= 400 && statusCode < 600 ? "error" : "success",

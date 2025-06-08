@@ -6,6 +6,7 @@ import { authMiddleware } from "../middlewares/authMiddleware"
 import { fileMiddleware } from "../middlewares/multer"
 import passport from "passport"
 import "../../../utils/passport"
+import { RefreshMiddleware } from "../middlewares/refresh"
 
 const router = Router()
 
@@ -20,7 +21,7 @@ router.patch("/forgotpassword", AsyncErrorHandler(userController.forgotPassword)
 router.patch("/resetpassword", AsyncErrorHandler(userController.resetPassword))
 router.post("/sendverificationemail", AsyncErrorHandler(userController.resendEmailVerify))
 router.patch("/ImageUpload", fileMiddleware.single("image"), authMiddleware, AsyncErrorHandler(profileController.uploadProfilePicture))
-router.post("/refresh", authMiddleware, AsyncErrorHandler(userController.refreshToken))
+router.post("/refresh", RefreshMiddleware, AsyncErrorHandler(userController.refreshToken))
 // router.post("/activity", authMiddleware, AsyncErrorHandler(profileController.userActivity))
 
 // Type-safe passport authentication handlers

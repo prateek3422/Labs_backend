@@ -25,12 +25,19 @@ class UserRepo implements IUserRepo {
                 id: id
             },
             include:{
-                solvedProblems: {
-                    select: {
-                        id: true,
+                submissions: {
+                    include: {
+                        problem: true
                     }
-                }
-            }
+                },
+                solvedProblems: {
+                    include:{
+                        problem: true
+                    }
+                },
+              
+            },
+            
         }))
 
         if (error) {
