@@ -5,10 +5,10 @@ import { commentController } from "../controllers";
 
 const route = Router()
 
-route.post("/create", authMiddleware, AsyncErrorHandler(commentController.createComment))
+route.post("/create", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(commentController.createComment))
 // route.get("/:comunityId", authMiddleware, AsyncErrorHandler(commentController.getCommentById))
-route.get("/", authMiddleware, AsyncErrorHandler(commentController.getAllComments))
-route.patch("/update", authMiddleware, AsyncErrorHandler(commentController.updateComment))
-route.delete("/delete", authMiddleware, AsyncErrorHandler(commentController.deleteComment))
+route.get("/", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(commentController.getAllComments))
+route.patch("/update", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(commentController.updateComment))
+route.delete("/delete", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(commentController.deleteComment))
 
 export { route as commentRouter }

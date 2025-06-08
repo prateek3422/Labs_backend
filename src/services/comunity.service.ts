@@ -59,7 +59,7 @@ class ComunityService {
     }
     async getComunityById(data: {
         id: string
-        userId: string
+        userId: string | undefined
     }) {
 
 

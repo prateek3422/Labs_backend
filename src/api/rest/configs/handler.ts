@@ -5,7 +5,7 @@ import { ZodError } from "zod"
 import { JsonWebTokenError } from "jsonwebtoken"
 
 //Type for async handler
-type AsyncHandler = (request: AppRequest, response: AppResponse, next: AppNextFunction) => Promise<unknown>
+type AsyncHandler = (request: AppRequest, response: AppResponse, next: AppNextFunction) => Promise<unknown> | void
 
 export const AsyncErrorHandler = (function_: AsyncHandler) => {
     return (request: AppRequest, response: AppResponse, next: AppNextFunction) => {

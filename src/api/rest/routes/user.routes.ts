@@ -11,18 +11,18 @@ import { RefreshMiddleware } from "../middlewares/refresh"
 const router = Router()
 
 router.post("/signup", AsyncErrorHandler(userController.CreateUser))
-router.post("/verify", TokenMiddleWare, AsyncErrorHandler(userController.verifyEmail))
+router.post("/verify", AsyncErrorHandler(TokenMiddleWare), AsyncErrorHandler(userController.verifyEmail))
 router.post("/signin", AsyncErrorHandler(userController.loginUser))
-router.post("/signout", authMiddleware, AsyncErrorHandler(userController.logOutUser))
-router.get("/getuser", authMiddleware, AsyncErrorHandler(userController.getuser))
-router.get("/getalluser", authMiddleware, AsyncErrorHandler(userController.getAllUser))
-router.patch("/updateuser", authMiddleware, AsyncErrorHandler(userController.refreshToken))
+router.post("/signout", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.logOutUser))
+router.get("/getuser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.getuser))
+router.get("/getalluser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.getAllUser))
+router.patch("/updateuser", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(userController.refreshToken))
 router.patch("/forgotpassword", AsyncErrorHandler(userController.forgotPassword))
 router.patch("/resetpassword", AsyncErrorHandler(userController.resetPassword))
 router.post("/sendverificationemail", AsyncErrorHandler(userController.resendEmailVerify))
-router.patch("/ImageUpload", fileMiddleware.single("image"), authMiddleware, AsyncErrorHandler(profileController.uploadProfilePicture))
-router.post("/refresh", RefreshMiddleware, AsyncErrorHandler(userController.refreshToken))
-// router.post("/activity", authMiddleware, AsyncErrorHandler(profileController.userActivity))
+router.patch("/ImageUpload", AsyncErrorHandler(fileMiddleware.single("image")), AsyncErrorHandler(authMiddleware), AsyncErrorHandler(profileController.uploadProfilePicture))
+router.post("/refresh", AsyncErrorHandler(RefreshMiddleware), AsyncErrorHandler(userController.refreshToken))
+// router.post("/activity", AsyncErrorHandler(authMiddleware), AsyncErrorHandler(profileController.userActivity))
 
 // Type-safe passport authentication handlers
 const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] }) as RequestHandler;

@@ -1,8 +1,6 @@
 import { createComunityValidation, updateComunityValidation } from "../validation";
 import { comunityService } from "@/services/comunity.service";
 import { HttpError } from "../configs";
-import { tokenUtilities } from "@/utils/tokenUtile";
-import { myEnvironment } from "@/configs";
 import { AppRequest, AppResponse, AppNextFunction } from "@/types";
 
 class ComunityController {
@@ -69,13 +67,9 @@ class ComunityController {
     }
     getComunityById = async (request: AppRequest, response: AppResponse, next: AppNextFunction) => {
         const { id } = request.params
-        const token = request.cookies.AccessToken as  string
-
-        const decoded = tokenUtilities.verify(token, myEnvironment.ACCESS_TOKEN)
-        const userId =  decoded as {
-            id: string
-        }
-        const comunity = await comunityService.getComunityById({ id, userId: userId.id })
+        const userId = request.user?.id 
+ 
+        const comunity = await comunityService.getComunityById({ id, userId: userId })
 
         if (comunity.sourceCode == 200) {
             response.status(comunity.sourceCode).json({
