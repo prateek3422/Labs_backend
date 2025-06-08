@@ -41,13 +41,20 @@ interface GoogleProfileExtended extends GoogleProfile {
 }
 
 interface GitHubProfileExtended extends GitHubProfile {
+    id: string;
+    username: string;
+    emails?: { value: string; verified?: boolean }[];
+    photos?: { value: string }[];
     _json: {
-        email: string;
-        name: string;
+        login: string;
+        id: number;
         avatar_url: string;
-        email_verified?: boolean;
-        sub?: string;
-    };
+        html_url: string;
+        email: string | null;
+        name: string;
+        sub: string;
+    }
+
 }
 
 try {
@@ -71,14 +78,14 @@ try {
 
     //@ts-expect-error  google strategy expects a string for clientID and clientSecret
     passport.use(new GoogleStrategy({
-        clientID: myEnvironment.GOOGLE_CLIENT_ID ,
+        clientID: myEnvironment.GOOGLE_CLIENT_ID,
         clientSecret: myEnvironment.GOOGLE_CLIENT_SECRET,
         callbackURL: myEnvironment.CALLBACK_URL
     },
         (
-            accessToken: string, 
-            refreshToken: string, 
-            profile: GoogleProfileExtended, 
+            accessToken: string,
+            refreshToken: string,
+            profile: GoogleProfileExtended,
             done: (error?: Error | null, user?: User | false) => void
         ) => {
             (async () => {
@@ -134,14 +141,14 @@ try {
         callbackURL: myEnvironment.GITHUB_CALLBACK_URL,
     },
         (
-            accessToken: string, 
-            refreshToken: string, 
-            profile: GitHubProfileExtended, 
+            accessToken: string,
+            refreshToken: string,
+            profile: GitHubProfileExtended,
             done: (error?: Error | null, user?: User | false) => void
         ) => {
             (async () => {
                 try {
-                    const email = profile._json?.email;
+                    const email = profile?.emails && profile.emails.length > 0 ? profile.emails[0]?.value : undefined;
                     if (!email) {
                         return done(new HttpError("Email not found in GitHub profile", 400));
                     }
@@ -160,13 +167,13 @@ try {
                         }
                     } else {
                         const newUser = await userRepo.createUser({
-                            email: profile._json.email,
-                            name: profile._json.name || "",
+                            email: profile.emails && profile.emails.length > 0 ? profile.emails[0]?.value : "",
+                            name: profile.displayName || profile.username || "",
                             LoginType: "github",
-                            isVerified: profile._json.email_verified,
-                            password: profile._json.sub || "",
+                            isVerified: profile.emails && profile.emails.length > 0 ? profile.emails[0]?.verified : false,
+                            password: profile._json?.sub|| "",
                             image: {
-                                url: profile._json.avatar_url || "",
+                                url: profile._json?.avatar_url || "",
                                 publicId: ""
                             },
                         });
