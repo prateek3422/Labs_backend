@@ -55,7 +55,7 @@ class ComunityController {
             user: user || undefined
         })
 
-        if (comunities.sourceCode == 200) {
+        if (comunities.sourceCode == 201) {
             response.status(comunities.sourceCode).json({
                 message: comunities.message,
                 data: comunities.data,

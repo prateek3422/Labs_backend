@@ -21,7 +21,7 @@ class ComunityService {
 
         if (!newComunity) {
             return {
-                sourceCode: 500,
+                sourceCode: 400,
                 error: "error creating comunity",
             }
         }
